@@ -1,0 +1,125 @@
+FROG INC
+Request for Comments: 42069
+BCP: 123                                                     February 2016
+Category: FROG Best Practices
+
+
+                       THE R.I.B.B.I.T. PROTOCOL
+
+Status of this Memo
+
+   This document specifies an Internet Best Current Practices for the
+   Internet Community, and requests discussion and suggestions for
+   improvements.  Distribution of this memo is unlimited.
+
+Copyright Notice
+
+   If Richard Stallman doesn't believe in copyrights then by golly, we
+   don't believe in them either.
+
+Abstract
+
+   To facilitate exchange of FROG tips, we've created this big dumb
+   protocol. Duh.
+
+Table of Contents
+
+   1. FROG Considerations ....................................1
+   2. THE R.I.B.B.I.T. PROTOCOL ..............................1
+   3. An Example Exchange ....................................2
+   4. Conclusion .............................................2
+
+1. FROG Considerations
+
+   FROG is not an initialism. Do not represent FROG as F.R.O.G. in official
+   documents. R.I.B.B.I.T. MAY be represented either as R.I.B.B.I.T. or
+   RIBBIT as the former is very difficult to type.
+
+2. THE R.I.B.B.I.T. PROTOCOL
+
+   The R.I.B.B.I.T. protocol (Remote Interaction Bounding Behavior
+   Including Tips) defines the high-level semantics for exchanging FROG
+   tips.
+
+   We define the protocol in this format that I honestly had never heard
+   about before my crypto freak friend told me about it. Anyway here's
+   Wonderwall:
+
+   RibbitProtocol DEFINITIONS ::= BEGIN
+
+      FrogTip ::= SEQUENCE {
+         number    INTEGER,
+         tip       UTF8String
+      }
+
+      Croak ::= SEQUENCE(SIZE(0..50)) OF FrogTip
+   END
+
+   Each FROG tip contains semantic content and the number of the tip for
+   handy reference. "number" MUST BE unique across all FROG tips
+   everywhere until the end of time.
+
+FROG INC                    FROG Best Practices                    [Page 1]
+
+RFC 42069               THE R.I.B.B.I.T. PROTOCOL             February 2016
+
+   One gently queries for FROG tips and receives a sequence of zero to
+   fifty FROG tips back. This sequence is a Croak of FROG tips. This
+   summarizes the R.I.B.B.I.T. protocol.
+
+3. An Example Exchange
+
+   An example R.I.B.B.I.T. exchange to query a Croak over HTTP is as
+   follows.
+
+   First, a Croak represented as a DER-encoded bytestream is requested.
+
+     GET /tips HTTP/1.0
+     Accept: application/der-stream
+
+   FROG is sometimes sneaky and may return base64-encoded data. In this
+   example the data is raw, baby:
+
+     HTTP/1.0 200 OK
+     Content-Type: application/der-stream
+     0\x190\x17\x02\x01\x01\x0c\x12DO NOT ENCODE FROG
+
+   This data can then be decoded using an ASN.1 DER decoder library.
+
+4. Conclusion
+
+   To contribute to future drafts of this RFC, email root@frog.tips.
+
+   DO NOT CONCLUDE FROG. FROG DOES NOT HANDLE BREAKUPS WELL.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FROG INC                    FROG Best Practices                    [Page 2]

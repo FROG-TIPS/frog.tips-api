@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block js %}
+<script src="static/frog.js"></script>
+<script src="static/huh.js"></script>
+<script>$(function() {
+  $FROG({{ preloaded_tips|tojson if preloaded_tips else "FROG not found. Please check FROG's registration number." }});
+});</script>
+{% endblock %}
+{% block body %}
+<!-- LET US BE RENAISSANCE FROGS -->
+<h2 class="BANNER">HOW TO OPERATE YOUR FROG</h2>
+<img id="TIP_FROG" class="FROG" src="static/frog.png"/>
+<div class="column BLUB">
+  <h5>CLICK ON FROG FOR TIP</h5>
+  <h4 id="TIP">FROG loading. Meditate on FROG.</h4>
+</div>
+{% endblock %}
