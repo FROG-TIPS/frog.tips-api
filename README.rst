@@ -24,12 +24,16 @@ WELCOME, FRIEND
 
 FROG MAY BE LOADED USING THE PYTHON INTERPRETER:
 
+::
+
     git clone https://github.com/FROG-TIPS/frog.tips
     pushd frog.tips
     pip install -e .
 
 TO CONTRIBUTE TO FROG'S SMOOTH-RUNNING OPERATIONS,
 PULL ON FROG'S LEGS HERE:
+
+::
 
     https://github.com/FROG-TIPS/frog.tips/pull/new/master
 
