@@ -6,7 +6,7 @@ var $FROG = function() {
              var TIPS = DATA.tips,
                  TIP_FROG = function() {
                      var TIP = TIPS.pop();
-                     (TIP !== undefined) ? $("#TIP").html(TIP.tip) : LD_TIPS();
+                     (TIP !== undefined) ? $("#TIP").html('<a href="/' + TIP.number + '">' + TIP.tip + '</a>') : LD_TIPS();
                  };
 
              TIP_FROG();
