@@ -9,7 +9,7 @@ class FrogTip(univ.Sequence):
 
     @staticmethod
     def from_tip(tip):
-        return FrogTip().setComponents(tip.number, tip.tip)
+        return FrogTip().setComponents(tip['number'], tip['tip'])
 
 
 class Croak(univ.SequenceOf):
