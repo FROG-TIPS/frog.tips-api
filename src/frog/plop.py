@@ -7,7 +7,7 @@ from frog.christmas_tree_monster import some_tips_please_sir
 endpoint = Blueprint('gary', __name__, url_prefix='/~GARY')
 
 
-@endpoint.route('/DE/MANUAL_2//')
+@endpoint.route('/DE/MANUAL_2//a.b')
 #@endpoint.route('/DE/MANUAL_2//DAS_IST_MEIN_FROG.ASPX')
 def frog_manual():
     raw_tips = some_tips_please_sir()
