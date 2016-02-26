@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config.from_envvar('FLASK_CONFIG')
-db = SQLAlchemy()
+db = SQLAlchemy(session_options={'autocommit': False, 'autoflush': False})
 
 
 @app.errorhandler(404)

@@ -7,9 +7,8 @@ from frog.christmas_tree_monster import some_tips_please_sir
 endpoint = Blueprint('gary', __name__, url_prefix='/~GARY')
 
 
-@endpoint.route('/<path:whatever>')
-def frog_manual(whatever):
-    raw_tips = some_tips_please_sir()
+class GermanTranslator(object):
+
     mapping = [
         (r'\bA\b', 'EINE'),
         (r'\bOR\b', 'ODER'),
@@ -24,12 +23,17 @@ def frog_manual(whatever):
         (r'\bTHIS\b', 'DIESES'),
     ]
 
-    # Deutsch it inefficiently.
-    tips = []
-    for tip in raw_tips:
-        tip = tip.tip
-        for find, replace in mapping:
-            tip = re.sub(find, replace, tip)
-        tips.append(tip)
+    def translate(self, text):
+        # Deutsch it inefficiently but hilariously
+        for find, replace in self.mapping:
+            text = re.sub(find, replace, text)
+        return text
+
+
+@endpoint.route('/<path:whatever>')
+def frog_manual(whatever):
+    translator = GermanTranslator()
+    tips = [tip['tip'] for tip in some_tips_please_sir()]
+    translated = list(map(translator.translate, tips))
 
     return render_template('gary/das_ist_mein_frog.html', tips=tips)
