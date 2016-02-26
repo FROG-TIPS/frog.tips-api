@@ -9,4 +9,5 @@ def init_db(app, db):
         # TODO: DON'T DO THIS IN HERE
         Tip.metadata.create_all(bind=db.engine)
         db.session.add(Tip(number=1, tip='DO NOT TEST FROG AS THIS MAY DAMAGE FROG.', approved=True))
+        db.session.add(Tip(number=2, tip='DO NOT HARDCODE FROG.', approved=True))
         db.session.commit()

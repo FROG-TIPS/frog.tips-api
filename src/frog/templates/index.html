@@ -2,11 +2,11 @@
 {% block js %}
 <script src="static/frog.js"></script>
 <script src="static/huh.js"></script>
-<script>$(function() {
+<script>(function(window,undefined){
   $FROG({
     data: {{ preloaded_tips|tojson if preloaded_tips else 'undefined' }}
   });
-});</script>
+})(window);</script>
 {% endblock %}
 {% block body %}
 <!-- LET US BE RENAISSANCE FROGS -->

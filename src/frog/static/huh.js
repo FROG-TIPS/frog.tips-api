@@ -20,7 +20,7 @@ var $FROG = function() {
           var HDL_DATA = function(DATA) {
              var TIPS = DATA.tips,
                  SWAP_ID = function(number) {
-                   document.location.hash.replace(number);
+                   history.replaceState({number: number}, '', '#' + number);
                  },
                  TIP_FROG = function() {
                      var TIP = TIPS.pop();
@@ -43,7 +43,7 @@ var $FROG = function() {
           } else {
             $.ajax({
               type: 'GET',
-              url: '/api/1/tips',
+              url: '/api/1/tips/',
               success: function(DATA) {
                 if (DATA === undefined || (DATA.tips !== undefined && DATA.tips.length === 0)) {
                   // Prevent FROG overflow
