@@ -7,12 +7,12 @@ from frog.christmas_tree_monster import some_tips_please_sir
 endpoint = Blueprint('gary', __name__, url_prefix='/~GARY')
 
 
-@endpoint.route('/DE/MANUAL_2//a\.b')
-#@endpoint.route('/DE/MANUAL_2//DAS_IST_MEIN_FROG.ASPX')
-def frog_manual():
+@endpoint.route('/DE/MANUAL_2//<path:whatever>')
+def frog_manual(whatever):
     raw_tips = some_tips_please_sir()
     mapping = [
         ('W', 'V'),
+        ('r\bAND\b', 'UND'),
         (r'\bTHE\b', 'DIE'),
         (r'\bYOUR\b', 'DEINE'),
         (r'\bDO NOT\b', 'NEIMALS'),

@@ -1,5 +1,2 @@
 recursive-include src/frog/templates *
 recursive-include src/frog/static *
-recursive-include src/frog/gary *
-recursive-include src/frog/gary/static *
-recursive-include src/frog/gary/templates *
