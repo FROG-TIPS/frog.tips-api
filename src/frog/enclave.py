@@ -23,9 +23,9 @@ class ApiResponse(Response):
     def _to_default_response(self, response):
         try:
             # When in duck typing Rome, quack as the Romans do or bark or woof or whatever (you know those Romans)
-            tips = iter(response)
+            tips = list(iter(response))
             return flask.json.dumps(obj={'tips': tips})
-        except TypeError:
+        except TypeError as e:
             return flask.json.dumps(obj=response)
 
     def _to_der_response(self, response):
