@@ -1,1 +1,3 @@
-recursive-include src/frog/ *
+recursive-include src/frog/templates *
+recursive-include src/frog/static *
+recursive-include src/frog/gary *
