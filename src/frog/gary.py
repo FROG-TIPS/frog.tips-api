@@ -18,7 +18,7 @@ def frog_manual():
         (r'\bTHIS\b', 'DIESES'),
     ]
 
-    # Deutsch it inefficiently
+    # Deutsch it inefficiently.
     tips = []
     for tip in raw_tips:
         tip = tip.tip
