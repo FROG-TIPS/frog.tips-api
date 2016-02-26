@@ -29,8 +29,8 @@ app.register_blueprint(frog.boners.app)
 import frog.enclave
 app.register_blueprint(frog.enclave.api)
 
-import frog.gary
-app.register_blueprint(frog.gary.endpoint)
+import frog.plop
+app.register_blueprint(frog.plop.endpoint)
 
 if __name__ == "__main__":
     app.run()
