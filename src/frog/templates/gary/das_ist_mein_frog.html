@@ -1,6 +1,13 @@
+<head>
+  <script type='text/javascript' src='http://www.midijs.net/lib/midi.js'></script>
+  <script>
+    MIDIjs.play("{{ url_for('static', filename='gary/bluedanube.mid') }}");
+  </script>
+</head>
 <center>
   <img src="{{ url_for('static', filename='gary/deutschland.gif') }}" />
   <h1>Willkommen in die FROG Tips!</h1>
+  <a href="#" onClick="MIDIjs.stop();">Stop MIDI Playback</a>
   <ol style="text-align: center; list-style-position:inside;">
   {% for tip in tips %}
     <li>{{ tip }}</li>
