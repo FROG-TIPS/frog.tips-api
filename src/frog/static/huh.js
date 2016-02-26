@@ -20,7 +20,7 @@ var $FROG = function() {
           var HDL_DATA = function(DATA) {
              var TIPS = DATA.tips,
                  SWAP_ID = function(number) {
-                   document.location.hash = number;
+                   document.location.hash.replace(number);
                  },
                  TIP_FROG = function() {
                      var TIP = TIPS.pop();
