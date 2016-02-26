@@ -3,7 +3,9 @@
 <script src="static/frog.js"></script>
 <script src="static/huh.js"></script>
 <script>$(function() {
-  $FROG({{ preloaded_tips|tojson if preloaded_tips else "FROG not found. Please check FROG's registration number." }});
+  $FROG({
+    data: {{ preloaded_tips|tojson if preloaded_tips else 'undefined' }}
+  });
 });</script>
 {% endblock %}
 {% block body %}

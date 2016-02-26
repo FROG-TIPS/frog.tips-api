@@ -21,12 +21,12 @@ class ApiResponse(Response):
         super(ApiResponse, self).__init__(response, **kwargs)
 
     def _to_default_response(self, response):
-        try:
-            # When in duck typing Rome, quack as the Romans do or bark or woof or whatever (you know those Romans)
-            tips = list(iter(response))
-            return flask.json.dumps(obj={'tips': tips})
-        except TypeError as e:
+        if isinstance(response, dict):
             return flask.json.dumps(obj=response)
+        else:
+            # When in duck typing Rome, quack as the Romans do or bark or woof or whatever (you know those Romans)
+            tips = list(response)
+            return flask.json.dumps(obj={'tips': tips})
 
     def _to_der_response(self, response):
         # ASN1 provided for horrible crypto nerds
@@ -62,6 +62,7 @@ def tip(num):
 
 
 @api.route("/tips")
+@api.route('/tips/')
 def tips():
     """\
     List a whole bunch of tips in whatever big fat dumb format you want.
