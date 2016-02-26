@@ -25,7 +25,7 @@ var $FROG = function() {
                  TIP_FROG = function() {
                      var TIP = TIPS.pop();
                      if (TIP !== undefined) {
-                        $("#TIP").html('<a href="/' + TIP.number + '">' + TIP.tip + '</a>');
+                        $("#TIP").html('<a href="/#' + TIP.number + '">' + TIP.tip + '</a>');
                         SWAP_ID(TIP.number);
                      } else {
                         LD_TIPS();
