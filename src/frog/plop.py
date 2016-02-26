@@ -11,6 +11,10 @@ endpoint = Blueprint('gary', __name__, url_prefix='/~GARY')
 def frog_manual(whatever):
     raw_tips = some_tips_please_sir()
     mapping = [
+        (r'\bA\b', 'EINE'),
+        (r'\bOR\b', 'ODER'),
+        (r'\bWITH\b', 'MIT'),
+        (r'\bFROM\b', 'VON'),
         (r'\bIS NOT\b', 'KEINE'),
         (r'\bAND\b', 'UND'),
         (r'\bTHE\b', 'DIE'),
