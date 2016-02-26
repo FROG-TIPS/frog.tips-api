@@ -23,14 +23,14 @@ def injoke(res):
 import frog.poking
 frog.poking.init_db(app, db)
 
+import frog.plop
+app.register_blueprint(frog.plop.endpoint)
+
 import frog.boners
 app.register_blueprint(frog.boners.app)
 
 import frog.enclave
 app.register_blueprint(frog.enclave.api)
-
-import frog.plop
-app.register_blueprint(frog.plop.endpoint)
 
 if __name__ == "__main__":
     app.run()
