@@ -4,7 +4,7 @@ from flask import Blueprint, render_template
 from frog.christmas_tree_monster import some_tips_please_sir
 
 
-endpoint = Blueprint('gary', __name__, url_prefix='/GARY')
+endpoint = Blueprint('gary', __name__, url_prefix='/~GARY')
 
 
 @endpoint.route('/hey')
