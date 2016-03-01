@@ -21,14 +21,33 @@
   .BLUB {
   text-align: center;
   }
+  .CLICKABLES {
+  margin-top: 10em;
+  text-align: center;
+  font-size: 0.71em;
+  list-style: none;
+  }
+  .CLICKABLES A {
+  color: #B7A071;
+  }
+  .CLICKABLES LI {
+  display: inline;
+  padding-left: 10px;
+  }
   A {
   color: #5F4B32;
   text-decoration: none;
   }
-  body {
+  HTML {
+  height: 100%;
+  }
+  BODY {
+  height: 100%;
   font-family: 'Special Elite', monospace;
   background:#FBF0D9;
   color:#5F4B32;
+  }
+  .container {
   padding-top: 1.2em;
   }
   </style>
@@ -41,5 +60,10 @@
 {% block body %}{% endblock %}
     </div>
   </div>
+  <ul class="CLICKABLES">
+    <li><a href="https://twitter.com/frogtips">DAILY TIPS ON TWITTER</a></li>
+    <li><a href="https://github.com/FROG-TIPS">TECHNICAL INTEGRATION ON GITHUB</a></li>
+    <li><a href="https://www.youtube.com/channel/UCCIAY9KudHSIeeItYxY3M-w">VIDEO TIPS ON YOUTUBE</a></li>
+  </ul>
 </body>
 </html>
