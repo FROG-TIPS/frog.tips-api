@@ -26,13 +26,23 @@
   text-align: center;
   font-size: 0.71em;
   list-style: none;
+  padding: 0;
+  margin: 3em 0 0 4%;
   }
   .CLICKABLES A {
   color: #B7A071;
   }
   .CLICKABLES LI {
-  display: inline;
-  padding-left: 10px;
+  margin-bottom: 0.4em;
+  }
+  .CLICKABLES LI:after {
+  color: #B7A071;
+  display: block;
+  content: '—';
+  font-size: 0.5em;
+  }
+  .CLICKABLES LI:last-of-type:after {
+  content: '';
   }
   A {
   color: #5F4B32;
@@ -59,11 +69,11 @@
     <!-- DUHHHH -->
 {% block body %}{% endblock %}
     </div>
+    <ul class="CLICKABLES">
+      <li><a href="https://twitter.com/frogtips">DAILY TIPS ON TWITTER</a></li>
+      <li><a href="https://github.com/FROG-TIPS">TECHNICAL INTEGRATION ON GITHUB</a></li>
+      <li><a href="https://www.youtube.com/channel/UCCIAY9KudHSIeeItYxY3M-w">VIDEO TIPS ON YOUTUBE</a></li>
+    </ul>
   </div>
-  <ul class="CLICKABLES">
-    <li><a href="https://twitter.com/frogtips">DAILY TIPS ON TWITTER</a></li>
-    <li><a href="https://github.com/FROG-TIPS">TECHNICAL INTEGRATION ON GITHUB</a></li>
-    <li><a href="https://www.youtube.com/channel/UCCIAY9KudHSIeeItYxY3M-w">VIDEO TIPS ON YOUTUBE</a></li>
-  </ul>
 </body>
 </html>
