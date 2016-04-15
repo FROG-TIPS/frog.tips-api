@@ -36,4 +36,4 @@ def frog_manual(whatever):
     tips = [tip['tip'] for tip in some_tips_please_sir()]
     translated = list(map(translator.translate, tips))
 
-    return render_template('gary/das_ist_mein_frog.html', tips=tips)
+    return render_template('gary/das_ist_mein_frog.html', tips=translated)
