@@ -1,5 +1,7 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from flask_sqlalchemy import SQLAlchemy
+
+from frog.high_score import ApiError
 
 
 app = Flask(__name__)
@@ -10,6 +12,13 @@ db = SQLAlchemy(session_options={'autocommit': False, 'autoflush': False})
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('frogerror.html'), 404
+
+
+@app.errorhandler(ApiError)
+def handle_invalid_usage(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
 
 
 @app.after_request
@@ -32,5 +41,9 @@ app.register_blueprint(frog.boners.app)
 import frog.enclave
 app.register_blueprint(frog.enclave.api)
 
+import frog.surprise_folks
+app.register_blueprint(frog.surprise_folks.secret_api)
+
 if __name__ == "__main__":
-    app.run()
+    if app.debug:
+        app.run(ssl_context=(app.config['DEBUG_SSL_CERT'], app.config['DEBUG_SSL_KEY']))
