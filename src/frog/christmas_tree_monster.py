@@ -40,6 +40,7 @@ def open_sesame(master_phrase, phrase):
 
 def genie_remember_this_phrase():
     try:
+        # OH BOY, OUR OWN CRYPTO!!!
         random_bytes = os.urandom(32)
         phrase = base64.b64encode(random_bytes).decode('utf-8')
         db.session.add(Auth(phrase=phrase, revoked=False))
