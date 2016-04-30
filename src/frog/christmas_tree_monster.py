@@ -3,8 +3,13 @@ import base64
 
 from sqlalchemy.orm import class_mapper, ColumnProperty
 from sqlalchemy.sql.functions import random
+from sqlalchemy.exc import OperationalError
 
 from frog import db
+
+
+class PhraseError(Exception):
+    pass
 
 
 class Tip(db.Model):
@@ -23,26 +28,34 @@ class Auth(db.Model):
 def open_sesame(master_phrase, phrase):
     if phrase == master_phrase:
         return True
-    #
-    # db.session.query(Auth.phrase, Auth.revoked).filter()
-    return db.session.query(Auth.phrase, Auth.revoked) \
-                     .filter(Auth.revoked == False) \
-                     .filter(Auth.phrase == phrase)\
-                     .one_or_none() is not None
+
+    try:
+        return db.session.query(Auth.phrase, Auth.revoked) \
+                         .filter(Auth.revoked == False) \
+                         .filter(Auth.phrase == phrase)\
+                         .one_or_none() is not None
+    except OperationalError:
+        return False
 
 
 def genie_remember_this_phrase():
-    random_bytes = os.urandom(32)
-    phrase = base64.b64encode(random_bytes).decode('utf-8')
-    db.session.add(Auth(phrase=phrase, revoked=False))
-    db.session.commit()
-    return phrase
+    try:
+        random_bytes = os.urandom(32)
+        phrase = base64.b64encode(random_bytes).decode('utf-8')
+        db.session.add(Auth(phrase=phrase, revoked=False))
+        db.session.commit()
+        return phrase
+    except OperationalError:
+        raise PhraseError('PHRASE COULD NOT BE REMEMBERED.')
 
 
 def genie_forget_this_phrase(phrase):
-    db.session.query(Auth.phrase).filter(Auth.phrase == phrase) \
-                                 .update({'revoked': True})
-    db.session.commit()
+    try:
+        db.session.query(Auth.phrase).filter(Auth.phrase == phrase) \
+                                     .update({'revoked': True})
+        db.session.commit()
+    except OperationalError:
+        raise PhraseError('PHRASE COULD NOT BE FORGOTTEN.')
 
 
 def some_tips_please_sir():

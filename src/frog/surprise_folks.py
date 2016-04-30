@@ -2,7 +2,7 @@ from flask import abort, request, redirect, Blueprint, Response, current_app
 import flask.json
 
 from frog.christmas_tree_monster import the_search_for_spock, open_sesame, \
-    genie_remember_this_phrase, genie_forget_this_phrase
+    genie_remember_this_phrase, genie_forget_this_phrase, PhraseError
 
 from frog.high_score import ApiError
 
