@@ -76,7 +76,7 @@ def just_a_tip_oof_right_there(num):
         return result._asdict()
 
 
-def the_search_for_spock(fat_blob, limit=200):
+def the_search_for_spock(fat_blob, limit=100):
     fat_blob = fat_blob.replace(' ', '%').upper()
     results = db.session.query(Tip.number, Tip.tip) \
                        .filter(Tip.tip.like('%{0}%'.format(fat_blob), escape='\\')) \
