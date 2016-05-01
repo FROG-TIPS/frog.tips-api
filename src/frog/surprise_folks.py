@@ -29,7 +29,9 @@ def before_request():
             status_code=413)
 
     master_phrase = current_app.config['MASTER_AUTH_PHRASE']
-    phrase = request.headers.get('Authorization')
+
+    # APACHE IS STILL ALIVE IN KICKING IN 2016 DESPITE ITS BEST EFFORTS TO DESTROY ITSELF
+    phrase = request.headers.get('Authorization') or request.headers.get('X-Authorization')
 
     if not open_sesame(master_phrase, phrase):
         raise ApiError(
