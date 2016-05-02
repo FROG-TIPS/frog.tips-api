@@ -43,7 +43,8 @@ def add_auth():
         phrase = genie_remember_this_phrase()
         return flask.json.jsonify(phrase=phrase)
     except PhraseError as e:
-        raise ApiError(message=e)
+        raise ApiError(message=str(e))
+
 
 @secret_api.route('/auth/revoke', methods=['POST'])
 def revoke_auth():
@@ -58,7 +59,7 @@ def revoke_auth():
         genie_forget_this_phrase(phrase)
         return flask.json.jsonify(status='revoked')
     except PhraseError as e:
-        raise ApiError(message=e)
+        raise ApiError(message=str(e))
 
 
 @secret_api.route('/search', methods=['POST'])
