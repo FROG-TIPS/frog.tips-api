@@ -29,9 +29,7 @@ def before_request():
             status_code=413)
 
     master_phrase = current_app.config['MASTER_AUTH_PHRASE']
-
-    # APACHE IS STILL ALIVE IN KICKING IN 2016 DESPITE ITS BEST EFFORTS TO DESTROY ITSELF
-    phrase = request.headers.get('Authorization') or request.headers.get('X-Authorization')
+    phrase = request.headers.get('Authorization')
 
     if not open_sesame(master_phrase, phrase):
         raise ApiError(
@@ -41,20 +39,26 @@ def before_request():
 
 @secret_api.route('/auth/add', methods=['POST'])
 def add_auth():
-    phrase = genie_remember_this_phrase()
-    return flask.json.jsonify(phrase=phrase)
-
+    try:
+        phrase = genie_remember_this_phrase()
+        return flask.json.jsonify(phrase=phrase)
+    except PhraseError as e:
+        raise ApiError(message=e)
 
 @secret_api.route('/auth/revoke', methods=['POST'])
 def revoke_auth():
     try:
         data = request.get_json(force=True, silent=True)
         phrase = data['phrase']
-        genie_forget_this_phrase(phrase)
-        return flask.json.jsonify(status='revoked')
     except Exception as e:
         raise ApiError.as_json_hint(
             '{"phrase": "[EXTREME GILBERT GOTTFRIED VOICE] AUTH PHRASE"}')
+
+    try:
+        genie_forget_this_phrase(phrase)
+        return flask.json.jsonify(status='revoked')
+    except PhraseError as e:
+        raise ApiError(message=e)
 
 
 @secret_api.route('/search', methods=['POST'])
