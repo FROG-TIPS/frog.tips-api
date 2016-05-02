@@ -14,5 +14,5 @@ class ApiError(Exception):
 
     @staticmethod
     def as_json_hint(json, **kwargs):
-        kwargs.update('message', 'FROG EXPECTED JSON OF THE FORM: {0}'.format(json))
+        kwargs.update({'message', 'FROG EXPECTED JSON OF THE FORM: {0}'.format(json)})
         return ApiError(**kwargs)
