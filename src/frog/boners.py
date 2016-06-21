@@ -1,13 +1,13 @@
 from flask import Blueprint, render_template, abort
-from frog.christmas_tree_monster import some_tips_please_sir, just_a_tip_oof_right_there
+from frog.christmas_tree_monster import TipMaster
 
 
 app = Blueprint('app', __name__, url_prefix='/')
-
+tip_master = TipMaster()
 
 @app.route('')
 def root():
-    tips = some_tips_please_sir()
+    tips = tip_master.some_tips()
 
     # DISPLAY THIS TIP IN THE META DESCRIPTION FOR ALL THE CHAT PROGRAMS KIDS ARE USING THESE DAYS
     titular_tip = tips[0]['tip'] if tips else None

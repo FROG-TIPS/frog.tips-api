@@ -2,7 +2,7 @@ from flask import abort, request, render_template, Blueprint, Response
 import flask.json
 from pyasn1.codec.der import encoder
 
-from frog.christmas_tree_monster import some_tips_please_sir, just_a_tip_oof_right_there
+from frog.christmas_tree_monster import TipMaster
 from frog.smooshing import FrogTip, Croak
 
 
@@ -46,6 +46,7 @@ class ApiResponse(Response):
 
 
 api = Blueprint('api', __name__, url_prefix='/api/1')
+tip_master = TipMaster()
 
 
 @api.route('/tips/<int:num>')
@@ -53,7 +54,7 @@ def tip(num):
     """\
     List a single tip duh.
     """
-    tip = just_a_tip_oof_right_there(num)
+    tip = tip_master.just_the_tip(num)
 
     if tip is None:
         return abort(404)
@@ -67,7 +68,7 @@ def tips():
     """\
     List a whole bunch of tips in whatever big fat dumb format you want.
     """
-    tips = some_tips_please_sir()
+    tips = tip_master.some_tips()
     return ApiResponse(tips)
 
 

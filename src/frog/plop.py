@@ -1,10 +1,11 @@
 import re
 
 from flask import Blueprint, render_template
-from frog.christmas_tree_monster import some_tips_please_sir
+from frog.christmas_tree_monster import TipMaster
 
 
 endpoint = Blueprint('gary', __name__, url_prefix='/~GARY')
+tip_master = TipMaster()
 
 
 class GermanTranslator(object):
@@ -33,7 +34,7 @@ class GermanTranslator(object):
 @endpoint.route('/<path:whatever>')
 def frog_manual(whatever):
     translator = GermanTranslator()
-    tips = [tip['tip'] for tip in some_tips_please_sir()]
+    tips = [tip['tip'] for tip in tip_master.some_tips()]
     translated = list(map(translator.translate, tips))
 
     return render_template('gary/das_ist_mein_frog.html', tips=translated)

@@ -1,0 +1,118 @@
+WELCOME FRIEND.
+
+THANK YOU FOR YOUR PAID FROG MEMBERSHIP. HERE IS HOW TO ACCESS YOUR SUPER-SECRET
+FROG FEATURES:
+
+
+ADD AUTH PHRASE
+---------------
+/api/2/auth/add (application/json) POST
+
+TAKES:
+{
+  "comment"
+}
+
+RETURNS:
+{
+  "phrase"
+  "id"
+}
+
+YOUR PHRASE CAN NOW BE ADDED TO EVERY Authorization HEADER TO ACCESS THE REST
+OF THESE UNITED APPLICATION PROGRAMMING INTERFACES OF AMERICA.
+
+
+REVOKE AUTH PHRASE
+------------------
+/api/2/auth/revoke (application/json) POST
+
+TAKES:
+{
+  "id"
+}
+
+RETURNS:
+{
+  "status": "REVOKED"
+}
+
+
+LIST AUTH
+---------
+/api/2/auth (application/json) GET
+
+TAKES: NOTHING, YOU FOOL.
+RETURNS:
+{
+  "knowledge": [
+    {
+      "id"
+      "comment"
+    }
+  ]
+}
+
+
+ADD TIP
+-------
+/api/2/tips (application/json) POST
+
+TAKES:
+{
+  "text"
+}
+
+RETURNS:
+{
+  "number"
+}
+
+FROG SYSTEMS ENCOURAGES HUMOUROUS USERS TO ADD THEIR OWN TIPS.
+
+
+GET TIP
+-------
+/api/2/tips/{number} (appliation/json) GET
+
+TAKES: NOTHING, YOU FOOL.
+RETURNS:
+{
+  "number"
+  "approved"
+  "text"
+}
+
+
+APPROVE OR DISAPPROVE TIP
+-------------------------
+/api/2/tips/{number}/approve (application/json) PATCH
+/api/2/tips/{number}/disapprove (application/json) PATCH
+
+TAKES: NOTHING, YOU FOOL.
+RETURNS: NOTHING RELEVANT.
+
+TAKE THE POWER OF GOD (OR AS WE CALL IT AT FROG SYSTEMS, THE POWER OF FROG) IN
+YOUR HANDS AND APPROVE AND DISAPPROVE OF TIPS.
+
+
+SEARCH FOR IT
+-------------
+/api/2/search (application/json) POST
+
+TAKES:
+{
+  "query"
+  "approved_only"
+}
+
+RETURNS:
+{
+  "results": [
+    {
+      "number"
+      "approved"
+      "text"
+    }
+  ]
+}
