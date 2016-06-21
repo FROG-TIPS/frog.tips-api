@@ -69,6 +69,7 @@ def help():
 
 
 @secret_api.route('/auth/add', methods=['POST'])
+@try_or_hint('{"comment": "DESCRIBE WHY YOU DECIDED TO LET YET ANOTHER PERSON IN ON THE SECRET"}')
 def add_auth():
     try:
         comment = get_json('comment')
@@ -88,9 +89,11 @@ def revoke_auth():
 
 @secret_api.route('/auth/', methods=['GET'])
 def list_auth():
-    knowledge = genie_share_your_knowledge()
-    return flask.json.jsonify(knowledge=knowledge)
-
+    try:
+        knowledge = genie_share_your_knowledge()
+        return flask.json.jsonify(knowledge=knowledge)
+    except PhraseError as e:
+        raise ApiError(message=str(e))
 
 @secret_api.route('/search', methods=['POST'])
 @try_or_hint('{"query": "YOUR FAT DUMB SEARCH CRITERIA", "approved_only": "true OR false TO SEARCH ONLY APPROVED TIPS. DEFAULT TO true."}')
