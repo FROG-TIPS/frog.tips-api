@@ -32,8 +32,9 @@ class as_dict(object):
 class Tip(db.Model):
     __tablename__ = 'tips'
     number = db.Column('id', db.Integer, primary_key=True)
-    tip = db.Column(db.String(255))
-    approved = db.Column(db.Boolean())
+    tip = db.Column(db.String(255), nullable=False)
+    approved = db.Column(db.Boolean(), nullable=False)
+    tweeted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
 
 
 class Auth(db.Model):
@@ -189,7 +190,7 @@ class TipMaster(object):
         fields = [Tip.number, Tip.tip]
 
         if super_secret_info:
-            fields.append(Tip.approved)
+            fields.extend([Tip.approved, Tip.tweeted])
 
         query = self.session.query(*fields)
 
