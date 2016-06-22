@@ -20,6 +20,7 @@ setup(
         'flask == 0.10.1',
         'flask-sqlalchemy == 2.1',
         'pyasn1 == 0.1.9',
+        'jsonpatch == 1.14',
     ],
     license='Private',
 )

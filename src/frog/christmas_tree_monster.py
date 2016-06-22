@@ -1,10 +1,12 @@
 import os
 import base64
 import functools
+import datetime
 
 from sqlalchemy.orm import class_mapper, ColumnProperty
 from sqlalchemy.sql.functions import random
 from sqlalchemy.exc import OperationalError
+import jsonpatch
 
 from frog import db
 
@@ -104,7 +106,7 @@ class CramTipError(Exception):
     pass
 
 
-class ApproveTipError(Exception):
+class UpdateTipError(Exception):
     pass
 
 
@@ -174,17 +176,39 @@ class TipMaster(object):
         except OperationalError:
             raise CramTipError('COULD NOT ADD TIP.')
 
-    def approve_of_your_child(self, number, approve):
+    def its_not_a_phase(self, number, patch):
         try:
-            tip = db.session.query(Tip).filter(Tip.number == number).one_or_none()
+            tip = self.session.query(Tip.number, Tip.tip, Tip.approved, Tip.tweeted) \
+                              .filter(Tip.number == number) \
+                              .one_or_none()
 
             if tip is None:
-                raise ModerateTipError()
+                raise UpdateTipError()
 
-            tip.approved = approve
+            tip = tip._asdict()
+            new_patch = []
+
+            # BLESS THIS MESS
+            for oper in list(patch):
+                if oper['op'] != 'replace':
+                    raise UpdateTipError('{0} OPERATION IS NOT SUPPORTED'.format(oper['op']))
+
+                if oper['path'] == '/tweeted':
+                    try:
+                        oper['value'] = datetime.datetime.utcfromtimestamp(oper['value'])
+                    except Exception:
+                        # It wasn't worth converting anyway
+                        pass
+
+                new_patch.append(oper)
+
+            new_patch = jsonpatch.JsonPatch(new_patch)
+            new_patch.apply(tip, in_place=True)
+
+            self.session.query(Tip).filter(Tip.number == number).update(tip)
             self.session.commit()
         except OperationalError:
-            raise ApproveTipError()
+            raise UpdateTipError()
 
     def _tip_query(self, super_secret_info, approved_only):
         fields = [Tip.number, Tip.tip]

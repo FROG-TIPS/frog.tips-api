@@ -2,6 +2,7 @@ import functools
 
 from flask import abort, request, redirect, Blueprint, Response, current_app, render_template
 import flask.json
+import jsonpatch
 
 from frog.christmas_tree_monster import open_sesame, \
     genie_remember_this_phrase, genie_forget_this_phrase, \
@@ -30,6 +31,8 @@ class try_or_hint(object):
         def wrapper(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
+            except ApiError as e:
+                raise e
             except Exception:
                 raise ApiError.as_json_hint(self.hint)
 
@@ -125,15 +128,8 @@ def get_tip(num):
         return flask.json.dumps(tip)
 
 
-@secret_api.route('/tips/<int:num>/<any(approve,disapprove):method>', methods=['PATCH'])
-@try_or_hint('DESPITE THIS BEING A PATCH METHOD, IT TAKES NO DATA.')
-def frog_approves_of_your_tip_young_man(num, method):
-    if method == 'approve':
-        approve = True
-    elif method == 'disapprove':
-        approve = False
-    else:
-        return abort(404)
-
-    tip_master.approve_of_your_child(num, approve=approve)
+@secret_api.route('/tips/<int:num>', methods=['PATCH'])
+def frog_approves_of_your_tip_young_man(num):
+    patch = jsonpatch.JsonPatch(request.get_json(force=True, silent=True))
+    tip_master.its_not_a_phase(num, patch=patch)
     return flask.json.jsonify(status='OKAY, SURE.')

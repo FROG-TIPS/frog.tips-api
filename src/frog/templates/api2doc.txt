@@ -84,16 +84,22 @@ RETURNS:
 }
 
 
-APPROVE OR DISAPPROVE TIP
+UPDATE A TIP
 -------------------------
-/api/2/tips/{number}/approve (application/json) PATCH
-/api/2/tips/{number}/disapprove (application/json) PATCH
+/api/2/tips/{number} (application/json) PATCH
 
-TAKES: NOTHING, YOU FOOL.
+TAKES:
+[
+  {"op": "replace", "path": "/approved", "value": true or false},
+  {"op": "replace", "path": "/tweeted", "value": UTC timestamp},
+]
+
 RETURNS: NOTHING RELEVANT.
 
 TAKE THE POWER OF GOD (OR AS WE CALL IT AT FROG SYSTEMS, THE POWER OF FROG) IN
 YOUR HANDS AND APPROVE AND DISAPPROVE OF TIPS.
+
+SEE http://jsonpatch.com/ FOR MORE INFO.
 
 
 SEARCH FOR IT
