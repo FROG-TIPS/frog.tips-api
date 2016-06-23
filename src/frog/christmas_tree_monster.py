@@ -114,10 +114,15 @@ class SearchTipError(Exception):
     pass
 
 
+def convert_timestamp(value):
+    return datetime.datetime.utcfromtimestamp(value)
+
+
 class TipMaster(object):
 
     CROAK_SIZE = 50
     SEARCH_SIZE = 100
+    SUPER_SECRET_FIELDS = [Tip.approved, Tip.tweeted]
 
     def __init__(self):
         # OH GOD THE GLOBALS ARE LEAKING
@@ -126,31 +131,48 @@ class TipMaster(object):
     @as_dict()
     def some_tips(self, super_secret_info=False, approved_only=True):
         try:
-            return self._tip_query(super_secret_info, approved_only) \
-                       .order_by(random()).limit(self.CROAK_SIZE) \
-                       .all()
+            query = self.tip_query(super_secret_info) \
+                        .order_by(random()) \
+                        .limit(self.CROAK_SIZE)
+
+            if approved_only:
+                query = query.filter(Tip.approved == approved_only) \
+
+            return query.all()
         except OperationalError:
             raise QueryTipError('TIP COULD NOT BE QUERIED.')
 
     @as_dict(single=True)
     def just_the_tip(self, number, super_secret_info=False, approved_only=True):
         try:
-            return self._tip_query(super_secret_info, approved_only) \
-                       .filter(Tip.number == number) \
-                       .one_or_none()
+            query = self.tip_query(super_secret_info) \
+                        .filter(Tip.number == number)
+
+            if approved_only:
+                query = query.filter(Tip.approved == approved_only) \
+
+            return query.one_or_none()
         except OperationalError:
             raise QueryTipError('TIP COULD NOT BE QUERIED.')
 
     @as_dict()
-    def search_for_spock(self, fat_blob, approved_only, limit=None):
-        limit = limit or self.SEARCH_SIZE
+    def search_for_spock(self, fat_filters):
+        query = self.tip_query(super_secret_info=True)
+
+        for key, value in fat_filters.items():
+            if value is None:
+                continue
+
+            if key == 'tip':
+                value = value.replace(' ', '%').upper()
+                query = query.filter(Tip.tip.like('%{0}%'.format(value), escape='\\'))
+            elif key == 'approved':
+                query = query.filter(Tip.approved == value)
+            elif key == 'tweeted':
+                query = query.filter(convert_timestamp(value))
 
         try:
-            fat_blob = fat_blob.replace(' ', '%').upper()
-            return self._tip_query(super_secret_info=True, approved_only=approved_only) \
-                       .filter(Tip.tip.like('%{0}%'.format(fat_blob), escape='\\')) \
-                       .limit(limit) \
-                       .all()
+            return query.limit(self.SEARCH_SIZE).all()
         except OperationalError:
             raise SearchTipError('YOUR BIG DUMB CRITERIA COULD NOT BE SEARCHED FOR.')
 
@@ -195,7 +217,7 @@ class TipMaster(object):
 
                 if oper['path'] == '/tweeted':
                     try:
-                        oper['value'] = datetime.datetime.utcfromtimestamp(oper['value'])
+                        oper['value'] = convert_timestamp(oper['value'])
                     except Exception:
                         # It wasn't worth converting anyway
                         pass
@@ -210,15 +232,10 @@ class TipMaster(object):
         except OperationalError:
             raise UpdateTipError()
 
-    def _tip_query(self, super_secret_info, approved_only):
+    def tip_query(self, super_secret_info):
         fields = [Tip.number, Tip.tip]
 
         if super_secret_info:
-            fields.extend([Tip.approved, Tip.tweeted])
+            fields.extend(self.SUPER_SECRET_FIELDS)
 
-        query = self.session.query(*fields)
-
-        if approved_only:
-            query = query.filter(Tip.approved == True)
-
-        return query
+        return self.session.query(*fields)

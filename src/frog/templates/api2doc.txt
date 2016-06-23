@@ -60,7 +60,7 @@ ADD TIP
 
 TAKES:
 {
-  "text"
+  "tip"
 }
 
 RETURNS:
@@ -80,7 +80,8 @@ RETURNS:
 {
   "number"
   "approved"
-  "text"
+  "tip"
+  "tweeted"
 }
 
 
@@ -104,12 +105,13 @@ SEE http://jsonpatch.com/ FOR MORE INFO.
 
 SEARCH FOR IT
 -------------
-/api/2/search (application/json) POST
+/api/2/tips/search (application/json) POST
 
 TAKES:
 {
-  "query"
-  "approved_only"
+  "tip"
+  "approved"
+  "tweeted"
 }
 
 RETURNS:
@@ -118,7 +120,8 @@ RETURNS:
     {
       "number"
       "approved"
-      "text"
+      "tip"
+      "tweeted"
     }
   ]
 }

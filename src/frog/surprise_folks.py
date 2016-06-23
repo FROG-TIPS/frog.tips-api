@@ -103,21 +103,21 @@ def list_auth():
         raise ApiError(message=str(e))
 
 
-@secret_api.route('/search', methods=['POST'])
-@try_or_hint('{"query": "YOUR FAT DUMB SEARCH CRITERIA", "approved_only": "true OR false TO SEARCH ONLY APPROVED TIPS. DEFAULT TO true."}')
+@secret_api.route('/tips/search', methods=['POST'])
+@try_or_hint('{"tip": "YOUR FAT DUMB SEARCH CRITERIA (TEXT; OPTIONAL)", "approved": "TIPS WITH THIS VALUE (BOOLEAN; OPTIONAL)", "tweeted": "TIPS WITH THIS VALUE (UTC TIMESTAMP; OPTIONAL)"}')
 def search():
     json = request.get_json(force=True, silent=True)
-    query = json['query']
-    approved_only = json.get('approved_only', True)
-    return api_response(data={'results': tip_master.search_for_spock(query, approved_only=approved_only)})
+    fields = ('tip', 'approved', 'tweeted')
+    query = dict(zip(fields, map(json.get, fields)))
+    return api_response(data={'results': tip_master.search_for_spock(query)})
 
 
 ## FULLY AUTOMATE YOUR FROG WITH THIS APE-Y EYE.
 
 @secret_api.route('/tips', methods=['POST'])
-@try_or_hint('{"text": "FULLY CAPITALIZED TIP MENTIONING FROG WITH FULL STOP."}')
+@try_or_hint('{"tip": "FULLY CAPITALIZED TIP MENTIONING FROG WITH FULL STOP."}')
 def give_tip():
-    text = get_json('text')
+    text = get_json('tip')
     number = tip_master.cram_tip(text)
     return api_response(data={'number': number})
 
