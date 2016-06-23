@@ -2,6 +2,7 @@ import os
 import base64
 import functools
 import datetime
+import contextlib
 
 from sqlalchemy.orm import class_mapper, ColumnProperty
 from sqlalchemy.sql.functions import random
@@ -29,6 +30,15 @@ class as_dict(object):
                     return [item._asdict() for item in as_list]
 
         return wrapper
+
+
+@contextlib.contextmanager
+def no_tears(err_class, message=None):
+    try:
+        yield
+    except OperationalError:
+        args = [message] if message is not None else []
+        raise err_class(*args)
 
 
 class Tip(db.Model):
@@ -99,24 +109,29 @@ def genie_share_your_knowledge():
 ## A TIP FOR ALL AND FOR ALL A GOOD TIP.
 
 class QueryTipError(Exception):
-    pass
+    def __init__(self, message='TIP COULD NOT BE QUERIED.'):
+        super(QueryTipError, self).__init__(message)
 
 
 class CramTipError(Exception):
-    pass
+    def __init__(self, message='TIP COULD NOT BE CRAMMED.'):
+        super(CramTipError, self).__init__(message)
 
 
 class UpdateTipError(Exception):
-    pass
+    def __init__(self, message='TIP COULD NOT BE UPDATED. HOWEVER, TIP IS STILL AVAILABLE FOR DATING.'):
+        super(UpdateTipError, self).__init__(message)
 
 
 class BulkUpdateTipError(UpdateTipError):
-    def __init__(self, row):
+    def __init__(self, message='CANNOT BULK IT UP', row=None):
         self.row = row
+        super(BulkUpdateTipError, self).__init__(message)
 
 
 class SearchTipError(Exception):
-    pass
+    def __init__(self, message='YOUR BIG DUMB CRITERIA COULD NOT BE SEARCHED FOR.'):
+        super(SearchTipError, self).__init__(message)
 
 
 def convert_patch_to_supported_values(patch):
@@ -156,7 +171,7 @@ class TipMaster(object):
 
     @as_dict()
     def some_tips(self, super_secret_info=False, approved_only=True):
-        try:
+        with no_tears(QueryTipError):
             query = self.tip_query(super_secret_info) \
                         .order_by(random())
 
@@ -164,12 +179,10 @@ class TipMaster(object):
                 query = query.filter(Tip.approved == approved_only)
 
             return query.limit(self.CROAK_SIZE).all()
-        except OperationalError:
-            raise QueryTipError('TIP COULD NOT BE QUERIED.')
 
     @as_dict(single=True)
     def just_the_tip(self, number, super_secret_info=False, approved_only=True):
-        try:
+        with no_tears(QueryTipError):
             query = self.tip_query(super_secret_info) \
                         .filter(Tip.number == number)
 
@@ -177,8 +190,6 @@ class TipMaster(object):
                 query = query.filter(Tip.approved == approved_only) \
 
             return query.one_or_none()
-        except OperationalError:
-            raise QueryTipError('TIP COULD NOT BE QUERIED.')
 
     @as_dict()
     def search_for_spock(self, fat_filters):
@@ -199,14 +210,13 @@ class TipMaster(object):
                 else:
                     query = query.filter(Tip.tweeted == None)
 
-        try:
+        with no_tears(SearchTipError):
             return query.all()
-        except OperationalError:
-            raise SearchTipError('YOUR BIG DUMB CRITERIA COULD NOT BE SEARCHED FOR.')
 
     def cram_tip(self, text):
-        session = self.session
-        try:
+        with no_tears(CramTipError):
+            session = self.session
+
             # SOME VERY IMPORTANT VERIFICATION
             if text.upper() != text:
                 raise CramTipError('TIPS MUST BE IN UPPERCASE. HOW DID YOU NOT NOTICE THAT?')
@@ -223,11 +233,8 @@ class TipMaster(object):
             session.commit()
             return tip.number
 
-        except OperationalError:
-            raise CramTipError('COULD NOT ADD TIP.')
-
     def its_not_a_phase(self, number, patch):
-        try:
+        with no_tears(UpdateTipError):
             tip = self.session.query(Tip.number, Tip.tip, Tip.approved, Tip.tweeted) \
                               .filter(Tip.number == number) \
                               .one_or_none()
@@ -241,8 +248,6 @@ class TipMaster(object):
 
             self.session.query(Tip).filter(Tip.number == number).update(tip)
             self.session.commit()
-        except OperationalError:
-            raise UpdateTipError()
 
     def its_not_a_goth_phase(self, patch):
         updates = {}
@@ -255,19 +260,17 @@ class TipMaster(object):
             tip = updates.setdefault(number, {'number': number})
             tip.update({field: oper['value']})
 
-        try:
+        with no_tears(UpdateTipError):
             for row, tip in enumerate(updates.values()):
                 try:
                     num_changed = self.session.query(Tip).filter(Tip.number == tip['number']).update(tip)
                     if num_changed != 1:
-                        raise BulkUpdateTipError(row=row)
+                        raise UpdateTipError(row=row)
 
                 except IntegrityError:
-                    raise BulkUpdateTipError(row=row)
+                    raise UpdateTipError(row=row)
 
             self.session.commit()
-        except OperationalError:
-            raise UpdateTipError()
 
     def tip_query(self, super_secret_info):
         fields = [Tip.number, Tip.tip]
