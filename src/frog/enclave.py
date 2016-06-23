@@ -10,11 +10,9 @@ from frog.high_score import BaseApiResponse, ApiError
 def convert_application_der_stream(data, status, content_type):
     # ASN1 provided for horrible crypto nerds
     try:
-        tips = iter(data)
-        data = Croak.from_tips(tips)
-    except TypeError:
-        tip = data
-        data = FrogTip.from_tip(tip)
+        data = Croak.from_tips(iter(data['tips']))
+    except (KeyError, TypeError):
+        data = FrogTip.from_tip(data)
 
     return encoder.encode(data)
 
