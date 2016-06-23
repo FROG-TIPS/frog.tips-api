@@ -7,7 +7,7 @@ import jsonpatch
 from frog.christmas_tree_monster import open_sesame, \
     genie_remember_this_phrase, genie_forget_this_phrase, \
     genie_share_your_knowledge, TipMaster, \
-    PhraseError, CramTipError, SearchTipError, QueryTipError
+    PhraseError, CramTipError, SearchTipError, QueryTipError, BulkUpdateTipError, UpdateTipError
 
 from frog.high_score import ApiError, BaseApiResponse
 
@@ -114,12 +114,27 @@ def search():
 
 ## FULLY AUTOMATE YOUR FROG WITH THIS APE-Y EYE.
 
-@secret_api.route('/tips', methods=['POST'])
-@try_or_hint('{"tip": "FULLY CAPITALIZED TIP MENTIONING FROG WITH FULL STOP."}')
+@secret_api.route('/tips', methods=['POST', 'PATCH'])
 def give_tip():
-    text = get_json('tip')
-    number = tip_master.cram_tip(text)
-    return api_response(data={'number': number})
+    if request.method == 'POST':
+        try:
+            text = get_json('tip')
+            number = tip_master.cram_tip(text)
+            return api_response(data={'number': number})
+        except Exception:
+            raise ApiError(message='FULLY CAPITALIZED TIP MENTIONING FROG WITH FULL STOP.')
+
+    elif request.method == 'PATCH':
+        try:
+            patch = jsonpatch.JsonPatch(request.get_json(force=True, silent=True))
+            tip_master.its_not_a_goth_phase(patch=patch)
+            return api_response(data={'status': 'NICE.'})
+        except BulkUpdateTipError as e:
+            return api_response(data={'row': e.row, 'status': 'UHOH.'}, status=400)
+        except UpdateTipError as e:
+            raise ApiError(message=str(e))
+        except Exception as e:
+            raise ApiError(message="SEE THIS: http://jsonpatch.com/. VALID OPS ARE replace, VALID PATHS ARE /{number}/approved AND /{number}/tweeted")
 
 
 @secret_api.route('/tips/<int:num>', methods=['GET'])

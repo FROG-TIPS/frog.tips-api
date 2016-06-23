@@ -5,7 +5,7 @@ import datetime
 
 from sqlalchemy.orm import class_mapper, ColumnProperty
 from sqlalchemy.sql.functions import random
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, IntegrityError
 import jsonpatch
 
 from frog import db
@@ -110,12 +110,39 @@ class UpdateTipError(Exception):
     pass
 
 
+class BulkUpdateTipError(UpdateTipError):
+    def __init__(self, row):
+        self.row = row
+
+
 class SearchTipError(Exception):
     pass
 
 
-def convert_timestamp(value):
-    return datetime.datetime.utcfromtimestamp(value)
+def convert_patch_to_supported_values(patch):
+    supported_ops = ['replace']
+    supported_paths = ['/tweeted', '/approved']
+    new_patch = []
+
+    for oper in list(patch):
+        if oper['op'] not in supported_ops:
+            raise UpdateTipError('{0} OPERATION IS NOT SUPPORTED'.format(oper['op']))
+
+        path = oper['path']
+
+        if not any(path.endswith(supported) for supported in supported_paths):
+            raise UpdateTipError('{0} IS NOT A SUPPORTED PATH'.format(path))
+
+        if path.endswith('/tweeted'):
+            try:
+                oper['value'] = datetime.datetime.utcfromtimestamp(oper['value'])
+            except Exception:
+                # It wasn't worth converting anyway
+                pass
+
+        new_patch.append(oper)
+
+    return jsonpatch.JsonPatch(new_patch)
 
 
 class TipMaster(object):
@@ -209,26 +236,35 @@ class TipMaster(object):
                 raise UpdateTipError()
 
             tip = tip._asdict()
-            new_patch = []
-
-            # BLESS THIS MESS
-            for oper in list(patch):
-                if oper['op'] != 'replace':
-                    raise UpdateTipError('{0} OPERATION IS NOT SUPPORTED'.format(oper['op']))
-
-                if oper['path'] == '/tweeted':
-                    try:
-                        oper['value'] = convert_timestamp(oper['value'])
-                    except Exception:
-                        # It wasn't worth converting anyway
-                        pass
-
-                new_patch.append(oper)
-
-            new_patch = jsonpatch.JsonPatch(new_patch)
+            new_patch = convert_patch_to_supported_values(patch)
             new_patch.apply(tip, in_place=True)
 
             self.session.query(Tip).filter(Tip.number == number).update(tip)
+            self.session.commit()
+        except OperationalError:
+            raise UpdateTipError()
+
+    def its_not_a_goth_phase(self, patch):
+        updates = {}
+
+        for oper in convert_patch_to_supported_values(patch):
+            parts = oper['path'].split('/', 2)
+            _, number, field = parts
+            number = int(number)
+
+            tip = updates.setdefault(number, {'number': number})
+            tip.update({field: oper['value']})
+
+        try:
+            for row, tip in enumerate(updates.values()):
+                try:
+                    num_changed = self.session.query(Tip).filter(Tip.number == tip['number']).update(tip)
+                    if num_changed != 1:
+                        raise BulkUpdateTipError(row=row)
+
+                except IntegrityError:
+                    raise BulkUpdateTipError(row=row)
+
             self.session.commit()
         except OperationalError:
             raise UpdateTipError()

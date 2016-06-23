@@ -86,7 +86,7 @@ RETURNS:
 
 
 UPDATE A TIP
--------------------------
+------------
 /api/2/tips/{number} (application/json) PATCH
 
 TAKES:
@@ -101,6 +101,26 @@ TAKE THE POWER OF GOD (OR AS WE CALL IT AT FROG SYSTEMS, THE POWER OF FROG) IN
 YOUR HANDS AND APPROVE AND DISAPPROVE OF TIPS.
 
 SEE http://jsonpatch.com/ FOR MORE INFO.
+
+
+BULK UPDATE A TIP (SWEET GAINS BRO)
+-----------------------------------
+/api/2/tips (application/json) PATCH
+
+TAKES:
+[
+  {"op": "replace", "path": "/{number}/approved", "value": true or false},
+  {"op": "replace", "path": "/{number}/tweeted", "value": UTC timestamp},
+]
+
+RETURNS:
+{
+  "status" UHOH. OR NICE.
+  "row" ROW NUMBER IF THERE IS AN ERROR AT THAT ROW. ONLY OCCURS WITH UHOH.
+}
+
+SO YOU WANNA BULK UP? SICK BRO, I HAVE JUST THE THING FOR YOU. USE THE BULK API
+EXACTLY LIKE THE REGULAR UPDATE API EXCEPT THE NUMBER OF THE TIP IS IN THE PATH.
 
 
 SEARCH FOR IT
