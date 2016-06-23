@@ -132,13 +132,12 @@ class TipMaster(object):
     def some_tips(self, super_secret_info=False, approved_only=True):
         try:
             query = self.tip_query(super_secret_info) \
-                        .order_by(random()) \
-                        .limit(self.CROAK_SIZE)
+                        .order_by(random())
 
             if approved_only:
                 query = query.filter(Tip.approved == approved_only) \
 
-            return query.all()
+            return query.limit(self.CROAK_SIZE).all()
         except OperationalError:
             raise QueryTipError('TIP COULD NOT BE QUERIED.')
 
