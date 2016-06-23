@@ -1,6 +1,6 @@
 import functools
 
-from flask import abort, request, redirect, Blueprint, Response, current_app, render_template
+from flask import abort, request, redirect, Blueprint, Response, current_app, render_template, Response
 import flask.json
 import jsonpatch
 
@@ -9,7 +9,7 @@ from frog.christmas_tree_monster import open_sesame, \
     genie_share_your_knowledge, TipMaster, \
     PhraseError, CramTipError, SearchTipError, QueryTipError
 
-from frog.high_score import ApiError
+from frog.high_score import ApiError, BaseApiResponse
 
 
 secret_api = Blueprint('secret_api', __name__, url_prefix='/api/2')
@@ -20,6 +20,10 @@ tip_master = TipMaster()
 # DO NOT LOOK BELOW THIS LINE
 # I'M WARNING YOUSE, MISTER
 # AW YOU DID IT, YA FAT IDIOT
+
+
+def api_response(data=None, status=None):
+    return BaseApiResponse(data=data, status=status)
 
 
 class try_or_hint(object):
@@ -77,7 +81,7 @@ def add_auth():
     try:
         comment = get_json('comment')
         phrase, id = genie_remember_this_phrase(comment)
-        return flask.json.jsonify(phrase=phrase, id=id)
+        return api_response(data={'phrase': phrase, 'id': id})
     except PhraseError as e:
         raise ApiError(message=str(e))
 
@@ -87,16 +91,17 @@ def add_auth():
 def revoke_auth():
     phrase_id = get_json('id')
     genie_forget_this_phrase(phrase_id)
-    return flask.json.jsonify(status='REVOKED.')
+    return api_response(data={'status': 'REVOKED.'})
 
 
 @secret_api.route('/auth/', methods=['GET'])
 def list_auth():
     try:
         knowledge = genie_share_your_knowledge()
-        return flask.json.jsonify(knowledge=knowledge)
+        return api_response(data={'knowledge': knowledge})
     except PhraseError as e:
         raise ApiError(message=str(e))
+
 
 @secret_api.route('/search', methods=['POST'])
 @try_or_hint('{"query": "YOUR FAT DUMB SEARCH CRITERIA", "approved_only": "true OR false TO SEARCH ONLY APPROVED TIPS. DEFAULT TO true."}')
@@ -104,7 +109,7 @@ def search():
     json = request.get_json(force=True, silent=True)
     query = json['query']
     approved_only = json.get('approved_only', True)
-    return flask.json.jsonify(results=tip_master.search_for_spock(query, approved_only=approved_only))
+    return api_response(data={'results': tip_master.search_for_spock(query, approved_only=approved_only)})
 
 
 ## FULLY AUTOMATE YOUR FROG WITH THIS APE-Y EYE.
@@ -114,7 +119,7 @@ def search():
 def give_tip():
     text = get_json('text')
     number = tip_master.cram_tip(text)
-    return flask.json.jsonify(number=number)
+    return api_response(data={'number': number})
 
 
 @secret_api.route('/tips/<int:num>', methods=['GET'])
@@ -123,13 +128,14 @@ def get_tip(num):
 
     if tip is None:
         # Sorry, you don't get our wonderful 404 page
-        return abort(404)
+        return api_response(status=404)
     else:
-        return flask.json.dumps(tip)
+        return api_response(data=tip)
 
 
 @secret_api.route('/tips/<int:num>', methods=['PATCH'])
+@try_or_hint('SEE THIS: http://jsonpatch.com/. VALID OPS ARE replace, VALID PATHS ARE /approved AND /tweeted')
 def frog_approves_of_your_tip_young_man(num):
     patch = jsonpatch.JsonPatch(request.get_json(force=True, silent=True))
     tip_master.its_not_a_phase(num, patch=patch)
-    return flask.json.jsonify(status='OKAY, SURE.')
+    return api_response(data={'status': "OKAY, SURE."})

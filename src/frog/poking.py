@@ -14,5 +14,6 @@ def init_db(app, db):
 
         db.session.add(Tip(number=1, tip='DO NOT TEST FROG AS THIS MAY DAMAGE FROG.', approved=True, tweeted=datetime.datetime.utcnow()))
         db.session.add(Tip(number=2, tip='DO NOT HARDCODE FROG.', approved=False))
+        db.session.add(Tip(number=3, tip=u'FROG IS UNICÖDE COMPLIANT ☃.', approved=True))
 
         db.session.commit()

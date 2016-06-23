@@ -6,6 +6,8 @@ from frog.high_score import ApiError
 
 app = Flask(__name__)
 app.config.from_envvar('FLASK_CONFIG')
+app.config['JSONIFY_MIMETYPE'] = 'application/json;charset=utf-8'
+
 db = SQLAlchemy(session_options={'autocommit': False, 'autoflush': False})
 
 
