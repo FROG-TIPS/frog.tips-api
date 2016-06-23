@@ -121,7 +121,6 @@ def convert_timestamp(value):
 class TipMaster(object):
 
     CROAK_SIZE = 50
-    SEARCH_SIZE = 100
     SUPER_SECRET_FIELDS = [Tip.approved, Tip.tweeted]
 
     def __init__(self):
@@ -171,7 +170,7 @@ class TipMaster(object):
                 query = query.filter(convert_timestamp(value))
 
         try:
-            return query.limit(self.SEARCH_SIZE).all()
+            return query.all()
         except OperationalError:
             raise SearchTipError('YOUR BIG DUMB CRITERIA COULD NOT BE SEARCHED FOR.')
 
