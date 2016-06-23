@@ -168,10 +168,10 @@ class TipMaster(object):
                 query = query.filter(Tip.approved == value)
             elif key == 'tweeted':
                 if value:
-                    query = query.filter(Tip.tweeted != null)
+                    query = query.filter(Tip.tweeted != None)
                 else:
-                    query = query.filter(Tip.tweeted == null)
-                    
+                    query = query.filter(Tip.tweeted == None)
+
         try:
             return query.all()
         except OperationalError:
