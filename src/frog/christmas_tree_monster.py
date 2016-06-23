@@ -167,8 +167,11 @@ class TipMaster(object):
             elif key == 'approved':
                 query = query.filter(Tip.approved == value)
             elif key == 'tweeted':
-                query = query.filter(convert_timestamp(value))
-
+                if value:
+                    query = query.filter(Tip.tweeted != null)
+                else:
+                    query = query.filter(Tip.tweeted == null)
+                    
         try:
             return query.all()
         except OperationalError:

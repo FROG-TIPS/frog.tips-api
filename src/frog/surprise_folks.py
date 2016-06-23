@@ -104,7 +104,7 @@ def list_auth():
 
 
 @secret_api.route('/tips/search', methods=['POST'])
-@try_or_hint('{"tip": "YOUR FAT DUMB SEARCH CRITERIA (TEXT; OPTIONAL)", "approved": "TIPS WITH THIS VALUE (BOOLEAN; OPTIONAL)", "tweeted": "TIPS WITH THIS VALUE (UTC TIMESTAMP; OPTIONAL)"}')
+@try_or_hint('{"tip": "YOUR FAT DUMB SEARCH CRITERIA (TEXT; OPTIONAL)", "approved": "TIPS THAT HAVE BEEN APPROVED (BOOLEAN; OPTIONAL)", "tweeted": "TIPS THAT HAVE BEEN TWEETED (BOOLEAN; OPTIONAL)"}')
 def search():
     json = request.get_json(force=True, silent=True)
     fields = ('tip', 'approved', 'tweeted')
