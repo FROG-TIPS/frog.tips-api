@@ -49,7 +49,7 @@ def tips():
     List a whole bunch of tips in whatever big fat dumb format you want.
     """
     tips = tip_master.some_tips()
-    return api_response(data=tips)
+    return api_response(data={'tips': tips})
 
 
 @api.route("/")

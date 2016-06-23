@@ -135,7 +135,7 @@ class TipMaster(object):
                         .order_by(random())
 
             if approved_only:
-                query = query.filter(Tip.approved == approved_only) \
+                query = query.filter(Tip.approved == approved_only)
 
             return query.limit(self.CROAK_SIZE).all()
         except OperationalError:
