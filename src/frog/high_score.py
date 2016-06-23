@@ -27,14 +27,19 @@ class ApiError(Exception):
 
 class BaseApiResponse(Response):
     def __init__(self, data=None, status=200, content_type=None, converters=None):
+        default_content_type = 'application/json;charset=utf-8'
         converters = dict(converters or [])
-        converters['application/json'] = self.convert_application_json
+        converters[default_content_type] = self.convert_application_json
 
         if content_type is None:
             # If the content type is not explicitly given, detect it
-            content_type = request.accept_mimetypes.best_match(['application/json'] + list(converters.keys()))
+            content_type = request.accept_mimetypes.best_match([default_content_type] + list(converters.keys()))
 
-        converter = converters[content_type]
+        try:
+            converter = converters[content_type]
+        except KeyError:
+            converter = converters[default_content_type]
+
         final_data = converter(data, status, content_type)
         super(BaseApiResponse, self).__init__(final_data, content_type=content_type, status=status)
 
