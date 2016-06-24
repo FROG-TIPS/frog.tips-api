@@ -235,42 +235,51 @@ class TipMaster(object):
 
     def its_not_a_phase(self, number, patch):
         with no_tears(UpdateTipError):
-            tip = self.session.query(Tip.number, Tip.tip, Tip.approved, Tip.tweeted) \
+            fields = [Tip.number, Tip.tip] + self.SUPER_SECRET_FIELDS
+            tip = self.session.query(*fields) \
                               .filter(Tip.number == number) \
                               .one_or_none()
 
             if tip is None:
                 raise UpdateTipError()
 
-            tip = tip._asdict()
-            new_patch = convert_patch_to_supported_values(patch)
-            new_patch.apply(tip, in_place=True)
+            old_tip = tip._asdict()
+            converted_patch = convert_patch_to_supported_values(patch)
+            new_tip = converted_patch.apply(old_tip, in_place=False)
 
-            self.session.query(Tip).filter(Tip.number == number).update(tip)
+            self.session.query(Tip).filter(Tip.number == number).update(new_tip)
             self.session.commit()
 
-    def its_not_a_goth_phase(self, patch):
-        updates = {}
+            diff_patch = jsonpatch.JsonPatch.from_diff(old_tip, new_tip)
+            return diff_patch
 
-        for oper in convert_patch_to_supported_values(patch):
+
+    def its_not_a_goth_phase(self, patch):
+        tip_patches = {}
+
+        for oper in patch:
             parts = oper['path'].split('/', 2)
             _, number, field = parts
             number = int(number)
 
-            tip = updates.setdefault(number, {'number': number})
-            tip.update({field: oper['value']})
+            tip_patch = tip_patches.setdefault(number, [])
+            path = '/{0}'.format(field)
+            tip_patch.append({'op': oper['op'], 'path': path, 'value': oper['value']})
 
-        with no_tears(UpdateTipError):
-            for row, tip in enumerate(updates.values()):
-                try:
-                    num_changed = self.session.query(Tip).filter(Tip.number == tip['number']).update(tip)
-                    if num_changed != 1:
-                        raise UpdateTipError(row=row)
+        # Now apply these patches individually and collect all the horrible errors
+        results = []
+        for number, patch in tip_patches.items():
+            try:
+                diff_patch = self.its_not_a_phase(number, patch)
 
-                except IntegrityError:
-                    raise UpdateTipError(row=row)
+                if not diff_patch:
+                    results.append('UNCHANGED.')
+                else:
+                    results.append('CHANGED.')
+            except UpdateTipError:
+                results.append('ERROR.')
 
-            self.session.commit()
+        return results
 
     def tip_query(self, super_secret_info):
         fields = [Tip.number, Tip.tip]

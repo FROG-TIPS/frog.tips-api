@@ -127,12 +127,8 @@ def give_tip():
     elif request.method == 'PATCH':
         try:
             patch = jsonpatch.JsonPatch(request.get_json(force=True, silent=True))
-            tip_master.its_not_a_goth_phase(patch=patch)
-            return api_response(data={'status': 'NICE.'})
-        except BulkUpdateTipError as e:
-            return api_response(data={'row': e.row, 'status': 'UHOH.'}, status=400)
-        except UpdateTipError as e:
-            raise ApiError(message=str(e))
+            results = tip_master.its_not_a_goth_phase(patch=patch)
+            return api_response(data=results)
         except Exception as e:
             raise ApiError(message="SEE THIS: http://jsonpatch.com/. VALID OPS ARE replace, VALID PATHS ARE /{number}/approved AND /{number}/tweeted")
 
