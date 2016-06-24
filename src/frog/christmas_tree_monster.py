@@ -277,7 +277,7 @@ class TipMaster(object):
                 else:
                     results.append('CHANGED.')
             except UpdateTipError:
-                results.append('ERROR.')
+                results.append('UHOH.')
 
         return results
 
