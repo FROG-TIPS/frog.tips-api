@@ -49,11 +49,6 @@ def get_json(key):
 
 @secret_api.before_request
 def before_request():
-    # DON'T SNOOP ON ME OR MY SON EVER AGAIN
-    if request.url.startswith('http://'):
-        url = request.url.replace('http://', 'https://', 1)
-        return redirect(url, code=301)
-
     content_length = request.content_length
 
     if content_length is not None and content_length > 1024:

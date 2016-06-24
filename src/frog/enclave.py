@@ -7,6 +7,10 @@ from frog.smooshing import FrogTip, Croak
 from frog.high_score import BaseApiResponse, ApiError
 
 
+api = Blueprint('api', __name__, url_prefix='/api/1')
+tip_master = TipMaster()
+
+
 def convert_application_der_stream(data, status, content_type):
     # ASN1 provided for horrible crypto nerds
     try:
@@ -22,10 +26,6 @@ def api_response(data=None, status=None):
         ('application/der-stream', convert_application_der_stream),
     )
     return BaseApiResponse(data=data, status=status, converters=converters)
-
-
-api = Blueprint('api', __name__, url_prefix='/api/1')
-tip_master = TipMaster()
 
 
 @api.route('/tips/<int:num>')

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 
 from frog.high_score import ApiError
@@ -29,6 +29,14 @@ def injoke(res):
     res.headers['Bay-Area'] = 'log off; yak shaving; python tire fire; gentrifrogcation'
     res.headers['Everybody-Back-In-The-Box'] = "fuckin' headers are full of ladybugs man"
     return res
+
+
+@app.before_request
+def don_nsa_proof_fedora():
+    # DON'T SNOOP ON ME OR MY SON EVER AGAIN
+    if request.url.startswith('http://'):
+        url = request.url.replace('http://', 'https://', 1)
+        return redirect(url, code=301)
 
 
 import frog.poking
