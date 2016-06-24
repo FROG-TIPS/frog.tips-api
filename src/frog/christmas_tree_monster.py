@@ -8,6 +8,7 @@ from sqlalchemy.orm import class_mapper, ColumnProperty
 from sqlalchemy.sql.functions import random
 from sqlalchemy.exc import OperationalError, IntegrityError
 import jsonpatch
+from enum import Enum
 
 from frog import db
 
@@ -108,6 +109,16 @@ def genie_share_your_knowledge():
 
 ## A TIP FOR ALL AND FOR ALL A GOOD TIP.
 
+class UpdateStatus(object):
+    CHANGED = 'CHANGED.'
+    UNCHANGED = 'UNCHANGED.'
+    UHOH = 'UHOH.'
+    UNSUPPORTED_PATH = 'UNSUPPORTED PATH.'
+    UNSUPPORTED_OP = 'UNSUPPORTED OP.'
+    UNSUPPORTED_VALUE = 'UNSUPPORTED VALUE.'
+    NO_TIP = 'UNSUPPORTED TIP.'
+
+
 class QueryTipError(Exception):
     def __init__(self, message='TIP COULD NOT BE QUERIED.'):
         super(QueryTipError, self).__init__(message)
@@ -119,14 +130,9 @@ class CramTipError(Exception):
 
 
 class UpdateTipError(Exception):
-    def __init__(self, message='TIP COULD NOT BE UPDATED. HOWEVER, TIP IS STILL AVAILABLE FOR DATING.'):
-        super(UpdateTipError, self).__init__(message)
-
-
-class BulkUpdateTipError(UpdateTipError):
-    def __init__(self, message='CANNOT BULK IT UP', row=None):
-        self.row = row
-        super(BulkUpdateTipError, self).__init__(message)
+    def __init__(self, status=UpdateStatus.UHOH):
+        self.status = status
+        super(UpdateTipError, self).__init__(status)
 
 
 class SearchTipError(Exception):
@@ -141,19 +147,19 @@ def convert_patch_to_supported_values(patch):
 
     for oper in list(patch):
         if oper['op'] not in supported_ops:
-            raise UpdateTipError('{0} OPERATION IS NOT SUPPORTED'.format(oper['op']))
+            raise UpdateTipError(status=UpdateStatus.UNSUPPORTED_OP)
 
         path = oper['path']
 
         if not any(path.endswith(supported) for supported in supported_paths):
-            raise UpdateTipError('{0} IS NOT A SUPPORTED PATH'.format(path))
+            raise UpdateTipError(status=UpdateStatus.UNSUPPORTED_PATH)
 
         if path.endswith('/tweeted'):
             try:
                 oper['value'] = datetime.datetime.utcfromtimestamp(oper['value'])
             except Exception:
                 # It wasn't worth converting anyway
-                pass
+                raise UpdateTipError(status=UpdateStatus.UNSUPPORTED_VALUE)
 
         new_patch.append(oper)
 
@@ -234,14 +240,14 @@ class TipMaster(object):
             return tip.number
 
     def its_not_a_phase(self, number, patch):
-        with no_tears(UpdateTipError):
+        try:
             fields = [Tip.number, Tip.tip] + self.SUPER_SECRET_FIELDS
             tip = self.session.query(*fields) \
                               .filter(Tip.number == number) \
                               .one_or_none()
 
             if tip is None:
-                raise UpdateTipError()
+                raise UpdateTipError(status=UpdateStatus.NO_TIP)
 
             old_tip = tip._asdict()
             converted_patch = convert_patch_to_supported_values(patch)
@@ -251,8 +257,15 @@ class TipMaster(object):
             self.session.commit()
 
             diff_patch = jsonpatch.JsonPatch.from_diff(old_tip, new_tip)
-            return diff_patch
+            if diff_patch:
+                return UpdateStatus.CHANGED
+            else:
+                return UpdateStatus.UNCHANGED
 
+        except OperationalError:
+            return UpdateStatus.UHOH
+        except UpdateTipError as e:
+            return e.status
 
     def its_not_a_goth_phase(self, patch):
         tip_patches = {}
@@ -267,18 +280,7 @@ class TipMaster(object):
             tip_patch.append({'op': oper['op'], 'path': path, 'value': oper['value']})
 
         # Now apply these patches individually and collect all the horrible errors
-        results = []
-        for number, patch in tip_patches.items():
-            try:
-                diff_patch = self.its_not_a_phase(number, patch)
-
-                if not diff_patch:
-                    results.append('UNCHANGED.')
-                else:
-                    results.append('CHANGED.')
-            except UpdateTipError:
-                results.append('UHOH.')
-
+        results = list(map(lambda args: self.its_not_a_phase(*args), tip_patches.items()))
         return results
 
     def tip_query(self, super_secret_info):

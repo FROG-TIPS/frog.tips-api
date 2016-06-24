@@ -21,6 +21,7 @@ setup(
         'flask-sqlalchemy == 2.1',
         'pyasn1 == 0.1.9',
         'jsonpatch == 1.14',
+        'enum34 == 1.1.6',
     ],
     license='Private',
 )
