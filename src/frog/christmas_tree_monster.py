@@ -269,6 +269,7 @@ class TipMaster(object):
 
     def its_not_a_goth_phase(self, patch):
         tip_patches = {}
+        order = []
 
         for oper in patch:
             parts = oper['path'].split('/', 2)
@@ -278,10 +279,10 @@ class TipMaster(object):
             tip_patch = tip_patches.setdefault(number, [])
             path = '/{0}'.format(field)
             tip_patch.append({'op': oper['op'], 'path': path, 'value': oper['value']})
+            order.append(number)
 
         # Now apply these patches individually and collect all the horrible errors
-        results = list(map(lambda args: self.its_not_a_phase(*args), tip_patches.items()))
-        return results
+        return [self.its_not_a_phase(num, tip_patches[num]) for num in order]
 
     def tip_query(self, super_secret_info):
         fields = [Tip.number, Tip.tip]
