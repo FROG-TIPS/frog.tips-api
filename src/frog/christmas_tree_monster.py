@@ -47,6 +47,7 @@ class Tip(db.Model):
     number = db.Column('id', db.Integer, primary_key=True)
     tip = db.Column(db.String(255), nullable=False)
     approved = db.Column(db.Boolean(), nullable=False)
+    moderated = db.Column(db.Boolean(), nullable=False, default=False)
     tweeted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
 
 
@@ -161,6 +162,10 @@ def convert_patch_to_supported_values(patch):
                 # It wasn't worth converting anyway
                 raise UpdateTipError(status=UpdateStatus.UNSUPPORTED_VALUE)
 
+        if path.endswith('/approved'):
+            # If the tip is explicitly approved or disapproved of, then it is moderated forever more
+            new_patch.append({'op': 'replace', 'path': '/moderated', 'value': True})
+
         new_patch.append(oper)
 
     return jsonpatch.JsonPatch(new_patch)
@@ -169,7 +174,7 @@ def convert_patch_to_supported_values(patch):
 class TipMaster(object):
 
     CROAK_SIZE = 50
-    SUPER_SECRET_FIELDS = [Tip.approved, Tip.tweeted]
+    SUPER_SECRET_FIELDS = [Tip.approved, Tip.tweeted, Tip.moderated]
 
     def __init__(self):
         # OH GOD THE GLOBALS ARE LEAKING
@@ -215,6 +220,8 @@ class TipMaster(object):
                     query = query.filter(Tip.tweeted != None)
                 else:
                     query = query.filter(Tip.tweeted == None)
+            elif key == 'moderated':
+                query = query.filter(Tip.moderated == value)
 
         with no_tears(SearchTipError):
             return query.all()

@@ -82,6 +82,7 @@ RETURNS:
   "approved"
   "tip"
   "tweeted"
+  "moderated" TRUE IF THE TIP HAS EVER BEEN APPROVED OR DISAPPROVED, FALSE OTHERWISE
 }
 
 
@@ -91,8 +92,8 @@ UPDATE A TIP
 
 TAKES:
 [
-  {"op": "replace", "path": "/approved", "value": true or false},
-  {"op": "replace", "path": "/tweeted", "value": UTC timestamp},
+  {"op": "replace", "path": "/approved", "value": TRUE OR FALSE},
+  {"op": "replace", "path": "/tweeted", "value": UTC TIMESTAMP},
 ]
 
 RETURNS: NOTHING RELEVANT.
@@ -141,6 +142,7 @@ TAKES:
   "tip" IF TEXT IS PROVIDED, IT WILL FILTER THE SEARCH RESULTS.
   "approved" IF TRUE, APPROVED TIPS. IF FALSE, UNAPPROVED TIPS. IF ABSENT, #NOFILTER
   "tweeted" IF TRUE, TWEETED TIPS. IF FALSE, UNTWEETED TIPS. IF ABSENT, #NOFILTER.
+  "moderated" IF TRUE, MODERATED TIPS. IF FALSE, UNMODERATED TIPS. IF ABSENT, #NOFILTER.
 }
 
 RETURNS:
@@ -151,6 +153,7 @@ RETURNS:
       "approved"
       "tip"
       "tweeted"
+      "moderated"
     }
   ]
 }

@@ -102,7 +102,7 @@ def list_auth():
 @try_or_hint('{"tip": "YOUR FAT DUMB SEARCH CRITERIA (TEXT; OPTIONAL)", "approved": "TIPS THAT HAVE BEEN APPROVED (BOOLEAN; OPTIONAL)", "tweeted": "TIPS THAT HAVE BEEN TWEETED (BOOLEAN; OPTIONAL)"}')
 def search():
     json = request.get_json(force=True, silent=True)
-    fields = ('tip', 'approved', 'tweeted')
+    fields = ('tip', 'approved', 'tweeted', 'moderated')
     query = dict(zip(fields, map(json.get, fields)))
     return api_response(data={'results': tip_master.search_for_spock(query)})
 
