@@ -157,6 +157,7 @@ def convert_patch_to_supported_values(patch):
 
         if path.endswith('/tweeted'):
             if oper['value'] is None:
+                new_patch.append(oper)
                 continue
 
             try:
