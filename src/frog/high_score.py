@@ -55,7 +55,4 @@ class BaseApiResponse(Response):
         if data is None:
             return
 
-        import pdb;
-        pdb.set_trace()
-
         return flask.json.dumps(obj=data, indent=None, ensure_ascii=False, default=default_encoder, encoding='utf-8')
