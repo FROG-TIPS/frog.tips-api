@@ -160,7 +160,7 @@ def convert_patch_to_supported_values(patch):
             try:
                 # Allow null values
                 if value is not None:
-                    oper['value'] = datetime.datetime.utcfromtimestamp(value)
+                    oper['value'] = int(value)
             except Exception:
                 # It wasn't worth converting anyway
                 raise UpdateTipError(status=UpdateStatus.UNSUPPORTED_VALUE)
