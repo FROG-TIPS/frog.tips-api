@@ -8,7 +8,7 @@ import flask.json
 
 def default_encoder(obj):
     try:
-        return time.mktime(obj.utctimetuple())
+        return int(time.mktime(obj.utctimetuple()))
     except:
         raise TypeError()
 
@@ -54,5 +54,8 @@ class BaseApiResponse(Response):
     def convert_application_json(self, data, status, content_type):
         if data is None:
             return
+
+        import pdb;
+        pdb.set_trace()
 
         return flask.json.dumps(obj=data, indent=None, ensure_ascii=False, default=default_encoder, encoding='utf-8')
