@@ -1,8 +1,16 @@
 import inspect
 import re
+import time
 
 from flask import Response, request
 import flask.json
+
+
+def default_encoder(obj):
+    try:
+        return time.mktime(obj.utctimetuple())
+    except:
+        raise TypeError()
 
 
 class ApiError(Exception):
@@ -47,4 +55,4 @@ class BaseApiResponse(Response):
         if data is None:
             return
 
-        return flask.json.dumps(obj=data, indent=None, ensure_ascii=False, encoding='utf-8')
+        return flask.json.dumps(obj=data, indent=None, ensure_ascii=False, default=default_encoder, encoding='utf-8')
