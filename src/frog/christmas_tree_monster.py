@@ -48,7 +48,7 @@ class Tip(db.Model):
     tip = db.Column(db.String(255), nullable=False)
     approved = db.Column(db.Boolean(), nullable=False)
     moderated = db.Column(db.Boolean(), nullable=False, default=False)
-    tweeted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
+    tweeted = db.Column(db.DateTime(timezone=True), nullable=True)
 
 
 class Auth(db.Model):
