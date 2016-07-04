@@ -117,6 +117,12 @@ def give_tip():
     return api_response(data={'number': number})
 
 
+@secret_api.route('/tips', methods=['GET'])
+@try_or_hint('THIS DOES NOT TAKE ANY PARAMETERS SO I HAVE NO IDEA HOW YOU MESSED IT UP.')
+def a_croak_of_tips_my_good_man():
+    return api_response(tip_master.some_tips())
+
+
 @secret_api.route('/tips', methods=['PATCH'])
 @try_or_hint("SEE THIS: http://jsonpatch.com/. VALID OPS ARE replace, VALID PATHS ARE /{number}/approved AND /{number}/tweeted")
 def bulk_tips():
@@ -134,11 +140,3 @@ def get_tip(num):
         return api_response(status=404)
     else:
         return api_response(data=tip)
-
-
-@secret_api.route('/tips/<int:num>', methods=['PATCH'])
-@try_or_hint('SEE THIS: http://jsonpatch.com/. VALID OPS ARE replace, VALID PATHS ARE /approved AND /tweeted')
-def frog_approves_of_your_tip_young_man(num):
-    patch = jsonpatch.JsonPatch(request.get_json(force=True, silent=True))
-    tip_master.its_not_a_phase(num, patch=patch)
-    return api_response(data={'status': "OKAY, SURE."})

@@ -151,17 +151,16 @@ def convert_patch_to_supported_values(patch):
             raise UpdateTipError(status=UpdateStatus.UNSUPPORTED_OP)
 
         path = oper['path']
+        value = oper['value']
 
         if not any(path.endswith(supported) for supported in supported_paths):
             raise UpdateTipError(status=UpdateStatus.UNSUPPORTED_PATH)
 
         if path.endswith('/tweeted'):
-            if oper['value'] is None:
-                new_patch.append(oper)
-                continue
-
             try:
-                oper['value'] = datetime.datetime.utcfromtimestamp(oper['value'])
+                # Allow null values
+                if value is not None:
+                    oper['value'] = datetime.datetime.utcfromtimestamp(value)
             except Exception:
                 # It wasn't worth converting anyway
                 raise UpdateTipError(status=UpdateStatus.UNSUPPORTED_VALUE)
