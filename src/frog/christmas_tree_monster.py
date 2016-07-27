@@ -7,6 +7,7 @@ import contextlib
 from sqlalchemy.orm import class_mapper, ColumnProperty
 from sqlalchemy.sql.functions import random
 from sqlalchemy.exc import OperationalError, IntegrityError
+from sqlalchemy import or_
 import jsonpatch
 from enum import Enum
 
@@ -57,6 +58,7 @@ class Auth(db.Model):
     phrase = db.Column(db.String(255))
     comment = db.Column(db.String(255))
     revoked = db.Column(db.Boolean())
+    perms = db.Column(db.Text())
 
 
 ## DEAL WITH THAT TROUBLESOME GENIE.
@@ -65,7 +67,11 @@ class PhraseError(Exception):
     pass
 
 
-def open_sesame(master_phrase, phrase):
+def format_perm(perm):
+    return ':{0}:'.format(perm)
+
+
+def open_sesame(master_phrase, phrase, perms):
     if phrase == master_phrase:
         return True
 
@@ -73,17 +79,20 @@ def open_sesame(master_phrase, phrase):
         return db.session.query(Auth.phrase, Auth.revoked) \
                          .filter(Auth.revoked == False) \
                          .filter(Auth.phrase == phrase) \
+                         .filter(or_(Auth.perms.contains(perm) for perm in map(format_perm, perms))) \
                          .one_or_none() is not None
     except OperationalError:
         return False
 
 
-def genie_remember_this_phrase(comment):
+def genie_remember_this_phrase(comment, perms):
     try:
         # OH BOY, OUR OWN CRYPTO!!!
         random_bytes = os.urandom(32)
         phrase = base64.b64encode(random_bytes).decode('utf-8')
-        auth = Auth(phrase=phrase, revoked=False, comment=comment)
+        smooshed_perms = ' '.join(map(format_perm, perms))
+        
+        auth = Auth(phrase=phrase, revoked=False, comment=comment, perms=smooshed_perms)
         db.session.add(auth)
         db.session.commit()
         return auth.phrase, auth.id
@@ -103,7 +112,7 @@ def genie_forget_this_phrase(id):
 @as_dict()
 def genie_share_your_knowledge():
     try:
-        return db.session.query(Auth.id, Auth.comment).all()
+        return db.session.query(Auth.id, Auth.comment, Auth.perms).all()
     except OperationalError:
         raise PhraseError("COULD NOT SHARE THE GENIE'S KNOWLEDGE.")
 

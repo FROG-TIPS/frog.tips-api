@@ -43,6 +43,26 @@ class try_or_hint(object):
         return wrapper
 
 
+class restrict_to(object):
+    def __init__(self, perms):
+        self.perms = perms
+
+    def __call__(self, func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            master_phrase = current_app.config['MASTER_AUTH_PHRASE']
+            phrase = request.headers.get('Authorization')
+
+            if not open_sesame(master_phrase, phrase, self.perms):
+                raise ApiError(
+                    message='FROG EXPECTED Authorization HEADER. ALTERNATIVELY, YOU MAY NOT HAVE PERMISSION TO ACCESS THIS.',
+                    status_code=401)
+
+            return func(*args, **kwargs)
+
+        return wrapper
+
+
 def get_json(key):
     return request.get_json(force=True, silent=True)[key]
 
@@ -56,32 +76,28 @@ def before_request():
             message='FROG CANNOT EXCEED MAXIMUM SIZE IN GIRTH, WIDTH OR LENGTH.',
             status_code=413)
 
-    master_phrase = current_app.config['MASTER_AUTH_PHRASE']
-    phrase = request.headers.get('Authorization')
-
-    if not open_sesame(master_phrase, phrase):
-        raise ApiError(
-            message='FROG EXPECTED Authorization HEADER.',
-            status_code=401)
-
 
 @secret_api.route('/')
+@restrict_to(['read'])
 def help():
     return render_template('api2doc.txt')
 
 
 @secret_api.route('/auth/add', methods=['POST'])
-@try_or_hint('{"comment": "DESCRIBE WHY YOU DECIDED TO LET YET ANOTHER PERSON IN ON THE SECRET"}')
+@restrict_to(['auth.add'])
+@try_or_hint('{"comment": "DESCRIBE WHY YOU DECIDED TO LET YET ANOTHER PERSON IN ON THE SECRET", "perms": "AN ARRAY OF PERMISSIONS"}')
 def add_auth():
     try:
         comment = get_json('comment')
-        phrase, id = genie_remember_this_phrase(comment)
+        perms = get_json('perms')
+        phrase, id = genie_remember_this_phrase(comment, perms)
         return api_response(data={'phrase': phrase, 'id': id})
     except PhraseError as e:
         raise ApiError(message=str(e))
 
 
 @secret_api.route('/auth/revoke', methods=['POST'])
+@restrict_to(['auth.del'])
 @try_or_hint('{"id": "[EXTREME GILBERT GOTTFRIED VOICE] AUTH PHRASE ID"}')
 def revoke_auth():
     phrase_id = get_json('id')
@@ -90,6 +106,7 @@ def revoke_auth():
 
 
 @secret_api.route('/auth/', methods=['GET'])
+@restrict_to(['auth.read'])
 def list_auth():
     try:
         knowledge = genie_share_your_knowledge()
@@ -99,6 +116,7 @@ def list_auth():
 
 
 @secret_api.route('/tips/search', methods=['POST'])
+@restrict_to(['tips.search'])
 @try_or_hint('{"tip": "YOUR FAT DUMB SEARCH CRITERIA (TEXT; OPTIONAL)", "approved": "TIPS THAT HAVE BEEN APPROVED (BOOLEAN; OPTIONAL)", "tweeted": "TIPS THAT HAVE BEEN TWEETED (BOOLEAN; OPTIONAL)"}')
 def search():
     json = request.get_json(force=True, silent=True)
@@ -110,6 +128,7 @@ def search():
 ## FULLY AUTOMATE YOUR FROG WITH THIS APE-Y EYE.
 
 @secret_api.route('/tips', methods=['POST'])
+@restrict_to(['tips.add'])
 @try_or_hint('FULLY CAPITALIZED TIP MENTIONING FROG WITH FULL STOP.')
 def give_tip():
     text = get_json('tip')
@@ -118,12 +137,14 @@ def give_tip():
 
 
 @secret_api.route('/tips', methods=['GET'])
+@restrict_to(['tips.read'])
 @try_or_hint('THIS DOES NOT TAKE ANY PARAMETERS SO I HAVE NO IDEA HOW YOU MESSED IT UP.')
 def a_croak_of_tips_my_good_man():
     return api_response(tip_master.some_tips())
 
 
 @secret_api.route('/tips', methods=['PATCH'])
+@restrict_to(['tips.mod'])
 @try_or_hint("SEE THIS: http://jsonpatch.com/. VALID OPS ARE replace, VALID PATHS ARE /{number}/approved AND /{number}/tweeted")
 def bulk_tips():
     patch = jsonpatch.JsonPatch(request.get_json(force=True, silent=True))
@@ -132,6 +153,7 @@ def bulk_tips():
 
 
 @secret_api.route('/tips/<int:num>', methods=['GET'])
+@restrict_to(['tips.read'])
 def get_tip(num):
     tip = tip_master.just_the_tip(num, super_secret_info=True, approved_only=False)
 
