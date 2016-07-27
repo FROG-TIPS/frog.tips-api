@@ -91,7 +91,7 @@ def genie_remember_this_phrase(comment, perms):
         random_bytes = os.urandom(32)
         phrase = base64.b64encode(random_bytes).decode('utf-8')
         smooshed_perms = ' '.join(map(format_perm, perms))
-        
+
         auth = Auth(phrase=phrase, revoked=False, comment=comment, perms=smooshed_perms)
         db.session.add(auth)
         db.session.commit()
@@ -112,7 +112,7 @@ def genie_forget_this_phrase(id):
 @as_dict()
 def genie_share_your_knowledge():
     try:
-        return db.session.query(Auth.id, Auth.comment, Auth.perms).all()
+        return db.session.query(Auth.id, Auth.comment, Auth.revoked, Auth.perms).all()
     except OperationalError:
         raise PhraseError("COULD NOT SHARE THE GENIE'S KNOWLEDGE.")
 
