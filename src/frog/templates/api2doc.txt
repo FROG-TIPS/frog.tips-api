@@ -1,7 +1,7 @@
 WELCOME FRIEND.
 
 THANK YOU FOR YOUR PAID FROG MEMBERSHIP. HERE IS HOW TO ACCESS YOUR SUPER-SECRET
-FROG FEATURES:
+FROG FEATURES, PROVIDED THAT YOU HAVE CORRECT PERMISSIONS.
 
 
 ADD AUTH PHRASE
@@ -110,9 +110,14 @@ BULK UPDATE A TIP (SWEET GAINS BRO)
 
 TAKES:
 [
-  {"op": "replace", "path": "/{number}/approved", "value": true or false},
-  {"op": "replace", "path": "/{number}/tweeted", "value": UTC timestamp},
+  {"op": "replace", "path": "/{number}/approved", "value": true OR false},
+  {"op": "replace", "path": "/{number}/tweeted", "value": UTC TIMESTAMP},
+  {"op": "replace", "path": "/{number}/tip", "value": NEW TIP TEXT},
 ]
+
+NOTE THAT WE CAN'T HAVE YOU MESSING UP THE TIPS TOO MUCH, AND SO CHANGING
+A TIP'S TEXT WILL NOT SUCCEED IF THE NEW TEXT DIFFERS TOO MUCH OR IS NOT
+FUNNY.
 
 RETURNS:
 [
@@ -124,6 +129,7 @@ RETURNS:
     "UNSUPPORTED OP."
     "UNSUPPORTED VALUE."
     "UNSUPPORTED PATH."
+    "NEW TIP TOO DIFFERENT."
     "UHOH." (A GENERAL ERROR)
 
   FOR EACH ELEMENT OF THE REQUEST DATA

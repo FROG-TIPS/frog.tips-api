@@ -10,6 +10,7 @@ from sqlalchemy.exc import OperationalError, IntegrityError
 from sqlalchemy import or_
 import jsonpatch
 from enum import Enum
+from howabout import get_levenshtein
 
 from frog import db
 
@@ -127,6 +128,7 @@ class UpdateStatus(object):
     UNSUPPORTED_OP = 'UNSUPPORTED OP.'
     UNSUPPORTED_VALUE = 'UNSUPPORTED VALUE.'
     NO_TIP = 'UNSUPPORTED TIP.'
+    NEW_TIP_TOO_DIFFERENT = 'NEW TIP TOO DIFFERENT.'
 
 
 class QueryTipError(Exception):
@@ -152,7 +154,7 @@ class SearchTipError(Exception):
 
 def convert_patch_to_supported_values(patch):
     supported_ops = ['replace']
-    supported_paths = ['/tweeted', '/approved']
+    supported_paths = ['/tweeted', '/approved', '/tip']
     new_patch = []
 
     for oper in list(patch):
@@ -187,6 +189,7 @@ class TipMaster(object):
 
     CROAK_SIZE = 50
     SUPER_SECRET_FIELDS = [Tip.approved, Tip.tweeted, Tip.moderated]
+    DIFF_THRESHOLD = 5
 
     def __init__(self):
         # OH GOD THE GLOBALS ARE LEAKING
@@ -271,6 +274,11 @@ class TipMaster(object):
             old_tip = tip._asdict()
             converted_patch = convert_patch_to_supported_values(patch)
             new_tip = converted_patch.apply(old_tip, in_place=False)
+
+            # Don't do what Johnny Don't does
+            diff = get_levenshtein(old_tip['tip'], new_tip['tip'])
+            if diff >= self.DIFF_THRESHOLD:
+                raise UpdateTipError(status=UpdateStatus.NEW_TIP_TOO_DIFFERENT)
 
             self.session.query(Tip).filter(Tip.number == number).update(new_tip)
             self.session.commit()

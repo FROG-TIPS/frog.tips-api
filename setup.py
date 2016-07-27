@@ -22,6 +22,7 @@ setup(
         'pyasn1 == 0.1.9',
         'jsonpatch == 1.14',
         'enum34 == 1.1.6',
+        'howabout == 1.1.0',
     ],
     license='Private',
 )

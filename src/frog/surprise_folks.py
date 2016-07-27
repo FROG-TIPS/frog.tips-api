@@ -125,7 +125,7 @@ def search():
     return api_response(data={'results': tip_master.search_for_spock(query)})
 
 
-## FULLY AUTOMATE YOUR FROG WITH THIS APE-Y EYE.
+## FULLY AUTOMATE YOUR FROG WITH THIS APE-Y EYE. TIPS OUT FOR HARAMBE.
 
 @secret_api.route('/tips', methods=['POST'])
 @restrict_to(['tips.add'])
@@ -145,7 +145,7 @@ def a_croak_of_tips_my_good_man():
 
 @secret_api.route('/tips', methods=['PATCH'])
 @restrict_to(['tips.mod'])
-@try_or_hint("SEE THIS: http://jsonpatch.com/. VALID OPS ARE replace, VALID PATHS ARE /{number}/approved AND /{number}/tweeted")
+@try_or_hint("SEE THIS: http://jsonpatch.com/. VALID OPS ARE replace, VALID PATHS ARE /{number}/approved, /{number}/tip AND /{number}/tweeted")
 def bulk_tips():
     patch = jsonpatch.JsonPatch(request.get_json(force=True, silent=True))
     results = tip_master.its_not_a_goth_phase(patch=patch)
