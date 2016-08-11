@@ -53,14 +53,6 @@ def injoke(res):
     return res
 
 
-@app.before_request
-def don_nsa_proof_fedora():
-    # DON'T SNOOP ON ME OR MY SON EVER AGAIN
-    if request.url.startswith('http://'):
-        url = request.url.replace('http://', 'https://', 1)
-        return redirect(url, code=301)
-
-
 import frog.poking
 frog.poking.init_db(app, db)
 
@@ -70,19 +62,17 @@ app.register_blueprint(frog.enclave.api)
 import frog.surprise_folks
 app.register_blueprint(frog.surprise_folks.secret_api)
 
-if __name__ == "__main__":
-    if app.debug:
-        from flask import send_from_directory
+# So this is happening
+if app.debug:
+    from flask import send_from_directory
 
-        @app.route('/', defaults={'path': 'index.html'})
-        @app.route('/<path:path>')
-        def send_file(path):
-            resp = send_from_directory(app.config['STATIC_SITE'], path)
+    @app.route('/', defaults={'path': 'index.html'})
+    @app.route('/<path:path>')
+    def send_file(path):
+        resp = send_from_directory(app.config['STATIC_SITE'], path)
 
-            # FUck me, right?
-            if path.lower().endswith('.aspx'):
-                resp.mimetype = 'text/html'
+        # FUck me, right?
+        if path.lower().endswith('.aspx'):
+            resp.mimetype = 'text/html'
 
-            return resp
-
-        app.run(ssl_context=(app.config['DEBUG_SSL_CERT'], app.config['DEBUG_SSL_KEY']))
+        return resp
