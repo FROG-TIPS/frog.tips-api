@@ -1,0 +1,3 @@
+[submodule "static"]
+	path = static
+	url = git@github.com:FROG-TIPS/frog.tips-static.git

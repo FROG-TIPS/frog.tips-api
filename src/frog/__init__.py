@@ -72,4 +72,17 @@ app.register_blueprint(frog.surprise_folks.secret_api)
 
 if __name__ == "__main__":
     if app.debug:
+        from flask import send_from_directory
+
+        @app.route('/', defaults={'path': 'index.html'})
+        @app.route('/<path:path>')
+        def send_file(path):
+            resp = send_from_directory(app.config['STATIC_SITE'], path)
+
+            # FUck me, right?
+            if path.lower().endswith('.aspx'):
+                resp.mimetype = 'text/html'
+
+            return resp
+
         app.run(ssl_context=(app.config['DEBUG_SSL_CERT'], app.config['DEBUG_SSL_KEY']))
