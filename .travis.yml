@@ -7,7 +7,10 @@ python:
 
 install:
   - pip install .
-  - pip install -r requirements/requirements.txt
+  - pip install -r requirements/test.txt
+
+script:
+  - nosetests test
 
 branches:
   only:
