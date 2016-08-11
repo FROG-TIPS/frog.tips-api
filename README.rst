@@ -2,6 +2,9 @@
 FROG TIPS
 =========
 
+.. image:: https://travis-ci.org/FROG-TIPS/frog.tips.svg?branch=master
+    :target: https://travis-ci.org/FROG-TIPS/frog.tips
+
 ::
 
             _     _
@@ -21,9 +24,6 @@ FROG TIPS
 ---------------
 WELCOME, FRIEND
 ---------------
-
-.. image:: https://travis-ci.org/FROG-TIPS/frog.tips.svg?branch=master
-    :target: https://travis-ci.org/FROG-TIPS/frog.tips
 
 FROG MAY BE LOADED USING THE PYTHON INTERPRETER:
 

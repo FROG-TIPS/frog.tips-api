@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
 
-version = '1.0.0'
+version = '1.0.1'
 
 setup(
     name='frog',
@@ -12,7 +12,7 @@ setup(
     zip_safe=False,
     version=version,
     description='FROG TIPS FOR ALL',
-    author='FROG-TIPS',
+    author='FROG SYSTEMS',
     classifiers=[
         'Private',
     ],
