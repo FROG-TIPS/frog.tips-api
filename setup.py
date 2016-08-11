@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
 
-version = '1.0.2-DEV'
+version = '1.0.3-DEV'
 
 setup(
     name='frog',
