@@ -146,7 +146,9 @@ var $FROG = function() {
         };
 
     THAT.RELOAD = function(OPTS) {
-      var PRELOADED = OPTS.data.tips;
+      var OPTS = OPTS || {},
+          DATA = OPTS.data || {},
+          PRELOADED = DATA.tips;
       $(window).on('hashchange', function(e) {
          LD_HASH_OR_PRELOADED(PRELOADED);
       });

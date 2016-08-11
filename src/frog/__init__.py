@@ -1,4 +1,7 @@
-from flask import Flask, render_template, jsonify, request, redirect
+import logging
+import sys
+
+from flask import Flask, jsonify, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 
 from frog.high_score import ApiError
@@ -7,13 +10,12 @@ from frog.high_score import ApiError
 app = Flask(__name__)
 app.config.from_envvar('FLASK_CONFIG')
 app.config['JSONIFY_MIMETYPE'] = 'application/json;charset=utf-8'
+app.config['TRAP_HTTP_EXCEPTIONS'] = True
+
+app.logger.addHandler(logging.StreamHandler(sys.stdout))
+app.logger.setLevel(logging.INFO)
 
 db = SQLAlchemy(session_options={'autocommit': False, 'autoflush': False})
-
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('frogerror.html'), 404
 
 
 @app.errorhandler(ApiError)
@@ -21,6 +23,26 @@ def handle_invalid_usage(error):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
+
+
+@app.errorhandler(Exception)
+def handle_all_api_crap(error):
+    # Handle redirects
+    try:
+        if error.code >= 300 and error.code < 400:
+            return error
+    except AttributeError:
+        pass
+
+    try:
+        body = {'status_code': error.code, 'message': (error.description or '').upper()}
+    except Exception as e:
+        app.logger.error(e)
+        body = {'status_code': 500, 'message': 'THERE WAS A PROBLEM HANDLING A PREVIOUS ERROR. REPORT THIS TO YOUR NEAREST BEARDED UNIX WIZARD.'}
+
+    resp = jsonify(body)
+    resp.status_code = body['status_code']
+    return resp
 
 
 @app.after_request
@@ -41,12 +63,6 @@ def don_nsa_proof_fedora():
 
 import frog.poking
 frog.poking.init_db(app, db)
-
-import frog.plop
-app.register_blueprint(frog.plop.endpoint)
-
-import frog.boners
-app.register_blueprint(frog.boners.app)
 
 import frog.enclave
 app.register_blueprint(frog.enclave.api)
