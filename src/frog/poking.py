@@ -1,3 +1,5 @@
+ # -*- coding: utf-8 -*-
+
 import datetime
 
 from frog.christmas_tree_monster import Tip, Auth
