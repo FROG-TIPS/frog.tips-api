@@ -1,4 +1,4 @@
-export FLASK_CONFIG=$(pwd)/config/test.py
+export FLASK_CONFIG=$(pwd)/src/frog/config/test.py
 export FLASK_MASTER_AUTH_PHRASE=CROAKING
 
 source .python/Scripts/activate
