@@ -37,7 +37,7 @@ def handle_all_api_crap(error):
     try:
         body = {'status_code': error.code, 'message': (error.description or '').upper()}
     except Exception as e:
-        app.logger.error(e)
+        app.logger.exception(e)
         body = {'status_code': 500, 'message': 'THERE WAS A PROBLEM HANDLING A PREVIOUS ERROR. REPORT THIS TO YOUR NEAREST BEARDED UNIX WIZARD.'}
 
     resp = jsonify(body)
