@@ -62,17 +62,18 @@ app.register_blueprint(frog.enclave.api)
 import frog.surprise_folks
 app.register_blueprint(frog.surprise_folks.secret_api)
 
-# So this is happening
-if app.debug:
-    from flask import send_from_directory
-
-    @app.route('/', defaults={'path': 'index.html'})
-    @app.route('/<path:path>')
-    def send_file(path):
-        resp = send_from_directory(app.config['STATIC_SITE'], path)
-
-        # FUck me, right?
-        if path.lower().endswith('.aspx'):
-            resp.mimetype = 'text/html'
-
-        return resp
+# FIXME: Re-enable if the gitlab static repo goes public again
+## So this is happening
+#if app.debug:
+#    from flask import send_from_directory
+#
+#    @app.route('/', defaults={'path': 'index.html'})
+#    @app.route('/<path:path>')
+#    def send_file(path):
+#        resp = send_from_directory(app.config['STATIC_SITE'], path)
+#
+#        # FUck me, right?
+#        if path.lower().endswith('.aspx'):
+#            resp.mimetype = 'text/html'
+#
+#        return resp
