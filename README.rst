@@ -2,8 +2,8 @@
 FROG TIPS
 =========
 
-.. image:: https://travis-ci.org/FROG-TIPS/frog.tips.svg?branch=master
-    :target: https://travis-ci.org/FROG-TIPS/frog.tips
+.. image:: https://travis-ci.org/FROG-TIPS/frog.tips-api.svg?branch=master
+    :target: https://travis-ci.org/FROG-TIPS/frog.tips-api
 
 ::
 
@@ -29,8 +29,8 @@ FROG MAY BE LOADED USING THE PYTHON INTERPRETER:
 
 ::
 
-    git clone https://github.com/FROG-TIPS/frog.tips
-    pushd frog.tips
+    git clone https://github.com/FROG-TIPS/frog.tips-api
+    pushd frog.tips-api
     git submodule update --init
     pip install -e .
     ./scripts/debug.sh
@@ -40,7 +40,7 @@ PULL ON FROG'S LEGS HERE:
 
 ::
 
-    https://github.com/FROG-TIPS/frog.tips/pull/new/master
+    https://github.com/FROG-TIPS/frog.tips-api/pull/new/master
 
 -------------------
 COMMON FROG ANSWERS
