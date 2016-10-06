@@ -140,7 +140,7 @@ def give_tip():
 @restrict_to(['tips.read'])
 @try_or_hint('THIS DOES NOT TAKE ANY PARAMETERS SO I HAVE NO IDEA HOW YOU MESSED IT UP.')
 def a_croak_of_tips_my_good_man():
-    return api_response(tip_master.some_tips())
+    return api_response(tip_master.some_tips(super_secret_info=True, approved_only=False))
 
 
 @secret_api.route('/tips', methods=['PATCH'])
