@@ -2,7 +2,7 @@
 FROG TIPS
 =========
 
-> FROG Systems develops only the latest and greatest tools for FROG. This code is no longer used internally but has been kept public as a reminder - and warning - for humanity.
+   FROG Systems develops only the latest and greatest tools for FROG. This code is no longer used internally but has been kept public as a reminder - and warning - for humanity.
 
 .. image:: https://travis-ci.org/FROG-TIPS/frog.tips-api.svg?branch=master
     :target: https://travis-ci.org/FROG-TIPS/frog.tips-api
